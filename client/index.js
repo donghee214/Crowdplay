@@ -9,7 +9,7 @@ import { createHistory } from 'history';
 import reducer from './reducers';
 import App     from './components/App';
 import Login   from './components/Login';
-import User    from './components/User';
+import Landing    from './components/Landing';
 import Error   from './components/Error';
 
 // load our css. there probably is a better way to do this
@@ -31,7 +31,7 @@ class Root extends Component {
         <Router history={hashHistory}>
           <Route path="/" component={App}>
             <IndexRoute component={Login} />
-            <Route path="/user/:accessToken/:refreshToken" component={User} />
+            <Route path="/user/:accessToken/:refreshToken" component={Landing} />
             <Route path="/error/:errorMsg" component={Error} />
           </Route>
         </Router>

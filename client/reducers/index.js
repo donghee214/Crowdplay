@@ -1,11 +1,22 @@
 import {
-  SPOTIFY_TOKENS, SPOTIFY_ME_BEGIN, SPOTIFY_ME_SUCCESS, SPOTIFY_ME_FAILURE
+  SPOTIFY_TOKENS, SPOTIFY_ME_BEGIN, SPOTIFY_ME_SUCCESS, SPOTIFY_ME_FAILURE, SPOTIFY_SEARCH_LOADING,SPOTIFY_SEARCH_DONE, SONGS
+  ,GETSONGS_BEGIN, GETSONGS_END, ADD_SONGS,TOGGLE_LOADSONGS, ADD_SONGS_DONE, UPDATE_VOTE, PLAYBACK_PLAYING
 } from '../actions/actions';
+import update from 'immutability-helper';
 
 /** The initial state; no tokens and no user info */
 const initialState = {
+  tracks: {loading:null},
   accessToken: null,
   refreshToken: null,
+  playback: false,
+  songList: {
+    loading: null,
+    add:null,
+    done: null,
+    list: [],
+    reloadAll: null
+  },
   user: {
     loading: false,
     country: null,
@@ -47,8 +58,72 @@ export default function reduce(state = initialState, action) {
   // currently no failure state :(
   case SPOTIFY_ME_FAILURE:
     return state;
+  case 'SET_MESSAGE':
+      return {
+        message: action.payload
+  };
+  case SPOTIFY_SEARCH_LOADING:
+    console.log('START')
+    return Object.assign({}, state, {
+      tracks: Object.assign({}, state.tracks, {loading: true})
+    });
+  case SPOTIFY_SEARCH_DONE:
+  console.log('DONE')
+    return Object.assign({}, state, {
+      tracks: Object.assign({}, action.data, {loading: false})
+    });
 
+  case SONGS:
+    return Object.assign({}, {
+      tracks: Object.assign({}, action.data, {loading: false})
+    });
+  case GETSONGS_BEGIN:
+    return Object.assign({}, state, {
+      songList: Object.assign({}, state.songList, {loading: true}, {reloadAll: false})
+    });
+
+  case GETSONGS_END:
+    return Object.assign({}, state, {
+      songList: Object.assign({}, {list:action.data}, {loading: false}, {reloadAll:true}, {user: state.user.id})
+    });
+
+  case ADD_SONGS:
+    let newArr = state.songList.list.slice(0)
+    newArr.push(action.data)
+    return Object.assign({}, state, {
+      songList: Object.assign({}, {list: newArr}, {loading: false}, {type:'song'}, {user: state.user.id})
+    });
+
+  case ADD_SONGS_DONE:
+    return Object.assign({}, state, {
+      songList: Object.assign({}, {list: state.songList.list}, {loading: false}, {add:false}, {user: state.user.id})
+    });
+
+  case TOGGLE_LOADSONGS:
+    return Object.assign({}, state, {
+      songList: Object.assign({}, state.songList, {loading: false}, {reloadAll:!state.songList.reloadAll})
+    });
+
+  case PLAYBACK_PLAYING:
+   return Object.assign({}, state, {
+      playback: action.data
+    });
+
+  case UPDATE_VOTE:
+    for(let i = 0; i < state.songList.list.length; i++){
+      if(state.songList.list[i].songId === action.data.songId){
+        return update(state,{
+          songList: {list: {
+            [i]: {
+              votecount:{$set: action.data.votecount},
+              voters: {$set: action.data.voters}
+            }
+          }}
+        })
+      }
+    }
+   
   default:
-    return state;
+    return state
   }
 }
