@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Setting from './svgs/setting.js';
 import Share from './svgs/share.js';
 

@@ -13,6 +13,19 @@ module.exports = {
     filename: 'bundle.js',
     publicPath: '/',
   },
+  externals: [
+    (function () {
+      var IGNORES = [
+        'electron'
+      ];
+      return function (context, request, callback) {
+        if (IGNORES.indexOf(request) >= 0) {
+          return callback(null, "require('" + request + "')");
+        }
+        return callback();
+      };
+    })()
+  ],
   module: {
     loaders: [
       { test: /\.svg$/, loaders: ['raw-loader']},
@@ -47,3 +60,7 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
   ],
 };
+
+module.exports.node = {
+  child_process: 'empty',
+}

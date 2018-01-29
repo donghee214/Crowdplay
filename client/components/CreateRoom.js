@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Create from './svgs/create.js'
-import {
-  createPlaylistContain
-} from '../actions/actions'
+
 // import {
 //   getMyInfo,
 //   setTokens,
@@ -29,7 +26,7 @@ export default class Createroom extends React.Component  {
 
   renderSonglist(){
     this.props.showVoting(this.props.id, this.state.inputValue)
-    createPlaylistContain(this.state.inputValue);
+    // createPlaylistContain(this.state.inputValue);
   }
 
   /** Render the user's info */

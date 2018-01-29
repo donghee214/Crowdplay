@@ -1,6 +1,8 @@
 import Spotify from 'spotify-web-api-js';
 import database from '../database.js';
-// import { dispatch } from 'redux';
+// import SpotifyWebHelper from 'spotify-web-helper';
+// const helper = SpotifyWebHelper();
+import { dispatch } from 'redux';
 
 const spotifyApi = new Spotify();
 
@@ -19,6 +21,8 @@ export const SONGS = 'SONGS';
 export const UPDATE_VOTE = "UPDATE_VOTE";
 export const TOGGLE_LOADSONGS = 'TOGGLE_LOADSONGS';
 export const PLAYBACK_PLAYING = 'PLAYBACK_PLAYING';
+export const REMOVE_SONGS = 'REMOVE_SONGS';
+export const CHANGE_CURRENTSONG = "CHANGE_CURRENTSONG";
 /** set the app's access and refresh tokens */
 export function setTokens({accessToken, refreshToken}) {
   if (accessToken) {
@@ -28,6 +32,70 @@ export function setTokens({accessToken, refreshToken}) {
 }
 
 
+function refresh() {
+     spotifyApi.getMyCurrentPlayingTrack().then(function(data){
+      // console.log(data)
+      if(data.item.duration_ms - data.progress_ms < 7500){
+        setTimeout(function(){
+          // console.log('NEXT IS CALLED')
+          nextSong()
+          }, 500);
+      }
+      else{
+        setTimeout(refresh, 5000);
+      }
+     })
+}
+
+export function play(){
+   let orderedlist =[];
+   return nextSong()
+   // database.ref('songs/').once('value').then(snapshot => {
+   //    orderedlist = Object.values(snapshot.val());
+   //    orderedlist.sort(function(a,b) {
+   //      return b.votecount - a.votecount;
+   //    });
+   //      return nextSong(orderedlist[0].uri, null)
+   //  }).catch(e => {
+   //    console.log(e)
+   //  });
+}
+
+let updateArr = []
+function nextSong(){
+      let orderedlist =[];
+      database.ref('songs/').once('value').then(snapshot => {
+      orderedlist = Object.values(snapshot.val());
+      orderedlist.sort(function(a,b) {
+        return b.votecount - a.votecount;
+      });
+        // console.log("FIRST SONG IN DB", orderedlist[0]);
+        //dispatch the orderedlist but while still keeping the song about to be played
+        //remove that song in index.js and dispatch the new orderedlis
+        updateArr = orderedlist.slice(1, orderedlist.length)
+        // dispatch({ type: GETSONGS_END, data: newOrderedList})
+        spotifyApi.play({"uris": [orderedlist[0].uri]}).then(() => setTimeout(refresh, 5000))
+        database.ref('songs/' + orderedlist[0].songId).remove()
+      }).catch(e => {
+        console.log(e)
+      });
+}
+
+export function skip(){
+   nextSong()
+}
+
+export function watchChildRemoved(dispatch) {
+  database.ref('songs/').on('child_removed', (snapshot) => {
+    // console.log('CURRENTLY PLAYING', snapshot.val())
+    dispatch({ type: REMOVE_SONGS, data: updateArr});
+    dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+    // console.log('CHILD HAS BEEN REMOVED', snapshot.val())
+  });
+}
+
+// initial call, or just call refresh directly
+setTimeout(refresh, 5000);
 // const config = {
 //   apiKey: "AIzaSyCWfDeoXue1YnVRZGXiy9q3M2A2-PknkbY",
 //   authDomain: "nextup-9685a.firebaseapp.com",
@@ -40,7 +108,7 @@ export function setTokens({accessToken, refreshToken}) {
 // firebase.initializeApp(config);
 // const database = database;
 
-let devices = null;
+
 let userId = null;
 let playlistId = null;
 let playlistUri = null;
@@ -64,19 +132,12 @@ export function addSongsDone(){
 
 export function watchGuestAddedEvent(dispatch) {
   database.ref('songs/').on('child_added', (snapshot) => {
-    
     dispatch({ type: ADD_SONGS, data: snapshot.val()});
-    console.log('CHILD HAS BEEN ADDED', snapshot.val())
+    // console.log('CHILD HAS BEEN ADDED', snapshot.val())
   });
-
-
-
-
-  // database.ref('/').on('child_changed', (snap) => {
-  //   console.log('CHILD HAS BEEN CHANGED')
-  //   // dispatch({ type: GETSONGS_END, data: 'orderedlist'});
-  // });
 }
+
+
 
 export function voteListener(dispatch) {
   database.ref('songs/').on('child_changed', (snapshot) => {
@@ -85,11 +146,6 @@ export function voteListener(dispatch) {
 }
 
 
-export function test(){
-  database.ref('people/' ).once('value').then(function (snapshot) {
-  console.log(snapshot.val());
-  })
-}
 
 export function addSongToQueue(){
   spotifyApi.addTracksToPlaylist(userId, playlistId, orderedlist[0].uri).then(()=> nextSong())
@@ -125,12 +181,7 @@ export function postSong(name, artist, time, picture, id, uri, userId){
   });*/
 }
 
-function test1(){
-  console.log("fsojfhsdjkfbd")
-  return dispatch => {
-    dispatch({ type: GETSONGS_END, data: 'orderedlist'});
-  }
-}
+
 
 export function orderSongs(){
 
@@ -149,6 +200,7 @@ export function orderSongs(){
           orderedlist.sort(function(a,b) {
             return b.votecount - a.votecount;
           });
+
           dispatch({ type: GETSONGS_END, data: orderedlist });
         }).catch(e => {
           dispatch({ type: GETSONGS_END, data: orderedlist });
@@ -173,7 +225,7 @@ export function getVote(){
 
   database.ref('songs/').on('child_changed', function(snapshot){
     return dispatch => {
-      console.log(snapshot.val())
+      // console.log(snapshot.val())
       dispatch({ type: SONGS, data: snapshot.val() });
     }
   })
@@ -195,67 +247,34 @@ export function getVote(){
 // };
 // fromDb(database, dispatch)
 
-export function getNumOfSongs(uri){
-  let orderedlist = [];
-   database.ref('songs/').once('value').then(function(snapshot){
-      orderedlist = Object.values(snapshot.val());
-      orderedlist.sort(function(a,b) {
-         return b.votecount - a.votecount;
-      })
-      // dispatch({ type: SONGS, data: [orderedlist] });
-      console.log(snapshot.val(), orderedlist)
-      // if(!orderedlist){
-      // spotifyApi.addTracksToPlaylist(userId, playlistId, uri)
-      // }
-  })
-}
+// export function getNumOfSongs(uri){
+//   let orderedlist = [];
+//    database.ref('songs/').once('value').then(function(snapshot){
+//       orderedlist = Object.values(snapshot.val());
+//       orderedlist.sort(function(a,b) {
+//          return b.votecount - a.votecount;
+//       })
+//       // dispatch({ type: SONGS, data: [orderedlist] });
+//       console.log(snapshot.val(), orderedlist)
+//       // if(!orderedlist){
+//       // spotifyApi.addTracksToPlaylist(userId, playlistId, uri)
+//       // }
+//   })
+// }
 
-let num;
-export function getNum(){
-  let val;
-   database.ref('songs/').once('value').then(function(snapshot){
-      console.log(snapshot.val())
-      if (snapshot.val() == null){
-        return 'fdsfndksflnd'
-      }
+// let num;
+// export function getNum(){
+//   let val;
+//    database.ref('songs/').once('value').then(function(snapshot){
+//       console.log(snapshot.val())
+//       if (snapshot.val() == null){
+//         return 'fdsfndksflnd'
+//       }
 
-    })
-}
-
-
+//     })
+// }
 
 
-
-export function DecrementVote(){
-    SONG_ID = document.getElementById('songid').value;
-    const user_id3 = '4314';
-
-    database.ref('songs/' + SONG_ID + '/upvote/' + user_id3).once('value', snap => {
-      let curr = snap.val()
-
-      if(curr===true){
-          console.log('nonregistered');
-          database.ref('songs/' + SONG_ID + '/upvote').child(user_id3).set(false)
-          database.ref('songs/' + SONG_ID + '/votecount').transaction(function(currentVote) {
-          var newValue = currentVote -2;
-          return newValue;
-        })
-      } else if (curr === false) {
-        database.ref('songs/' + SONG_ID + '/upvote').child(user_id3).set(null)
-        
-        database.ref('songs/' + SONG_ID + '/votecount').transaction(function(currentVote) {
-          var newValue = currentVote + 1;
-          return newValue;
-        })
-      } else {
-        database.ref('songs/' + SONG_ID + '/upvote').child(user_id3).set(false)
-        database.ref('songs/' + SONG_ID + '/votecount').transaction(function(currentVote) {
-        var newValue = currentVote -1;
-        return newValue;
-      }) 
-      }
-    })
-  }
 
 export function order(){
     let orderedlist = [];
@@ -300,7 +319,7 @@ export function increment(id, user_id3){
         if (song.voters && song.voters[user_id3]) {
           song.votecount--;
           song.voters[user_id3] = false;
-          console.log('THISFAR')
+          // console.log('THISFAR')
         } else {
           song.votecount++;
           if (!song.voters) {
@@ -315,41 +334,41 @@ export function increment(id, user_id3){
   })
 }
 
-export function createPlaylistContain(name){
-  function getPlaylists(){
-    spotifyApi.getUserPlaylists(userId, {limit:5}).then(function(data){
-      database.ref('playlist/').set({
-            playlistId: data.items[0].id,
-            uri: data.items[0].uri,
-            hostId: userId,
-            playing: false
-          })
-      playlistId = data.items[0].id;
-      playlistUri = data.items[0].uri
-    })
-  }
-    function createPlaylist(){
-      console.log('created')
-      spotifyApi.createPlaylist(userId, {
-      "name": name,
-      "description": "osafndsf",
-      "collaborative": true,
-      "public": false
-    }).then(() => getPlaylists())
-  }
-  createPlaylist()
-}
+// export function createPlaylistContain(name){
+//   function getPlaylists(){
+//     spotifyApi.getUserPlaylists(userId, {limit:5}).then(function(data){
+//       database.ref('playlist/').set({
+//             playlistId: data.items[0].id,
+//             uri: data.items[0].uri,
+//             hostId: userId,
+//             playing: false
+//           })
+//       playlistId = data.items[0].id;
+//       playlistUri = data.items[0].uri
+//     })
+//   }
+//     function createPlaylist(){
+//       console.log('created')
+//       spotifyApi.createPlaylist(userId, {
+//       "name": name,
+//       "description": "osafndsf",
+//       "collaborative": true,
+//       "public": false
+//     }).then(() => getPlaylists())
+//   }
+//   createPlaylist()
+// }
 /* get the user's info from the /me api */
 export function getMyInfo() {
-  function createPlaylist(id){
-    console.log('created')
-    spotifyApi.createPlaylist(id, {
-    "name": "testList2",
-    "description": "osafndsf",
-    "collaborative": true,
-    "public": false
-    })
-  }
+  // function createPlaylist(id){
+  //   console.log('created')
+  //   spotifyApi.createPlaylist(id, {
+  //   "name": "testList2",
+  //   "description": "osafndsf",
+  //   "collaborative": true,
+  //   "public": false
+  //   })
+  // }
 
   return dispatch => {
     dispatch({ type: SPOTIFY_ME_BEGIN});
@@ -366,44 +385,7 @@ export function getMyInfo() {
   };
 }
 
-export function skip(){
-    let orderedlist = [];
-    // dispatch({ type: SPOTIFY_SEARCH_LOADING});
-    database.ref('songs/').once('value').then(function(snapshot){
-      spotifyApi.getMyCurrentPlayingTrack().then(function(data){
-        console.log(data)
-        database.ref('songs/' + data.item.id).remove();
-      })
 
-      orderedlist = Object.values(snapshot.val());
-      orderedlist.sort(function(a,b) {
-         return b.votecount - a.votecount;
-      })
-       spotifyApi.skipToNext(devices)
-   })
-   
-       
-// if(keep){
-//         database.ref('songs/' + keep).remove();
-
-//       } else {
-//         database.ref('songs/' + orderedlist[0].songId).remove();
-
-//       }
-
-//       var keep;
-
-
-      // spotifyApi.addTracksToPlaylist(userId, playlistId, orderedlist[0].uri).then(()=> nextSong())
-      
-      
-   
-
-    
-    // return orderedlist
-
-
-}
 
 export function remove(id){
   database.ref('songs/' + id).remove();
@@ -417,19 +399,21 @@ export function addToPlaylist(id, dummy, uri){
 // export function getEndOfSong(){
 //   spotifyApi
 // }
-export function getDevices() {
 
-  // console.log('CALLED')
-  spotifyApi.getMyDevices().then(function(data) {
-    devices = data
-    // console.log('win')
-    console.log(data)
-    // spotifyApi.pause(data)
-  })
-  .catch(e => {
-    dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
-  });
-}
+
+// export function getDevices() {
+
+//   // console.log('CALLED')
+//   spotifyApi.getMyDevices().then(function(data) {
+//     devices = data
+//     // console.log('win')
+//     console.log(data)
+//     // spotifyApi.pause(data)
+//   })
+//   .catch(e => {
+//     dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
+//   });
+// }
 
 
 // export function getDevices() {
@@ -448,21 +432,21 @@ export function getDevices() {
 
 // }
 
-export function createPlaylist(){
-  return dispatch => {
-    dispatch({ type: SPOTIFY_ME_BEGIN});
-    spotifyApi.createPlaylist(id, {
-        "name": "testList2",
-        "description": "osafndsf",
-        "collaborative": true,
-        "public": true
-      })
-    .catch(e => {
-      dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
-    });
+// export function createPlaylist(){
+//   return dispatch => {
+//     dispatch({ type: SPOTIFY_ME_BEGIN});
+//     spotifyApi.createPlaylist(id, {
+//         "name": "testList2",
+//         "description": "osafndsf",
+//         "collaborative": true,
+//         "public": true
+//       })
+//     .catch(e => {
+//       dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
+//     });
 
-  };
-}
+//   };
+// }
 
 export function search(query){
   return dispatch => {
@@ -495,28 +479,24 @@ export function getCurrent(){
     // return details
 
 }
+
+
+    
+
+
+// helper.player.on('ready', () => {
+//   helper.player.on('end', () => { console.log('END')});
+
+
+// });
+
 export function pause(){
+
     spotifyApi.pause({})
 }
 
 
-export function play(uri){
-    if(playlistUri === uri){
-      spotifyApi.play({})
-      return false
-    }
-    else{
-      return spotifyApi.play({"context_uri": playlistUri}).then(function(){
-        console.log('changed')
-        return true
-      })
 
-    }
-    
-
-
-  
-}
 
 // export function play(){
 //   spotifyApi.play()

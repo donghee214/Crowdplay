@@ -1,52 +1,21 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import {Motion, spring} from 'react-motion';
 import Up from './Up1.js';
-import Down from './svgs/down.js';
+// import Down from './svgs/down.js';
 
 import {
-  increment,
-  getVote,
-  getId,
-  upvote
-
+  increment
 } from '../actions/actions'
 
-class Song extends Component  {
-    constructor(props){
-    super(props)
-      this.state = {userId: getId(), name:"songBoxUp"}
-
-  }
-
-  // componentDidMount(){
-  //   if(this.props.userId in this.props.info.voters && this.props.info.voters[this.props.userId]){
-  //     this.setState({name:'songBoxUpGreen'})
-  //   }
-  // }
-
+export default class Song extends React.Component{
 
   toggle(){
-    // this.setState({name: "songBoxUpGreen"})
-    increment(this.props.info.songId, this.state.userId);
-  }
-
-  unToggle(){
-    this.setState({name: "songBoxUpGreen"})
-  }
-
-  upvote(){
-    increment(this.props.info.songId, this.state.userId)
+    increment(this.props.info.songId, this.props.userId);
   }
 
 
-
-  downvote(){
-    // alert('downvote')
-  }
   render() {
-
-    // const {dispatch} = this.props
     console.log(this.props)
     return (
 
@@ -69,9 +38,7 @@ class Song extends Component  {
                     <h2 className="value">
                       {this.props.votes}
                     </h2>
-                  <button>
-                     <Down style={"songBoxDown"} dropvote ={this.downvote.bind(this)}/>
-                  </button>
+           
                 </div>
                 <div className="bottomContent">
                     <h1 className="songTitle">
@@ -92,5 +59,5 @@ class Song extends Component  {
 }
 
 
-export default connect(state => state)(Song);
+// export default connect(state => state)(Song);
 

@@ -8,7 +8,6 @@ import VotingRoom from './Votingroom.js';
 import Search from './Search.js';
 import {
   setTokens,
-  test,
   getMyInfo,
   getDevices
 }   from '../actions/actions';
@@ -35,7 +34,7 @@ class Landing extends Component {
     const {accessToken, refreshToken} = params;
     dispatch(setTokens({accessToken, refreshToken}));
     dispatch(getMyInfo())
-    dispatch(getDevices())
+    // dispatch(getDevices())
 
   }
   toggleDropDown(){
@@ -76,7 +75,6 @@ class Landing extends Component {
       <div>
         <Dropdown renderContent = {this.state.whatToRenderDropdown} toggleDropDown={this.toggleDropDown.bind(this)} doUnmount={this.state.mainPage}/>
         {this.state.votingRoom ? <VotingRoom searchClicked={this.searchClicked.bind(this)}roomName ={this.state.roomName} roomType={this.state.roomType}/> : <Home dropPayload={dropPayload}/>}
-     
       </div>
     );
   }

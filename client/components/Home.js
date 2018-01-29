@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import OptionBox from './OptionBox.js';
 import Createlogo from './svgs/create.js';
 import Joinlogo from './svgs/join.js';

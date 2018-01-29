@@ -5,13 +5,8 @@ import {
 } from '../../actions/actions'
 export default class Play extends React.Component {
 	clickHandle(){
-		play(this.props.context).then(function(){
-			console.log('updated')
-			this.props.updateMainSong()
-		}.bind(this))
-			
-		
 		this.props.toggle()
+		play()	
 	}
     render() {
 

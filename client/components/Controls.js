@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 import Previous from './svgs/previous.js';
 import Pause from './svgs/pause.js';
 import SkipComp from './svgs/SkipComp.js';
 import Play from './svgs/play.js';
 import {
-  pause
+  pause,
+  skip
 } from '../actions/actions'
 export default class Controls extends React.Component  {
 
@@ -19,7 +20,7 @@ export default class Controls extends React.Component  {
   }
 
   // componentDidMount(){
-  //   //write condition to check database and see if there are any songs
+  //   //write cconondition to check database and see if there are any songs
   //   //if there is not render big add button
   //   //else 
   // }
@@ -32,8 +33,8 @@ export default class Controls extends React.Component  {
          boxShadow: 'inset 0 0 0 1000px rgba(0,0,0,.3)',
       }}>
         <Previous />
-        {this.state.play ? <Pause pauseFunction={pause} toggle={this.toggle.bind(this)}/> : <Play context ={this.props.context} updateMainSong={this.props.updateMainSong} toggle={this.toggle.bind(this)}/>}
-        <SkipComp updateMainSong={this.props.updateMainSong}/>
+        {this.state.play ? <Pause pauseFunction={pause} toggle={this.toggle.bind(this)}/> : <Play toggle={this.toggle.bind(this)}/>}
+        <SkipComp skip={skip}/>
       </div>
     );
   }
