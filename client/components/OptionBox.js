@@ -20,9 +20,10 @@ export default class Option extends React.Component  {
   //   // dispatch(setTokens({accessToken, refreshToken}));
 
   // }
-
+  shouldComponentUpdate(){
+    return false
+  }
   buttonClicked(){
-    
     this.props.payload.dropPayload.toggleDropDown();
     if(this.props.id === "create"){
       this.props.payload.dropPayload.createClicked();

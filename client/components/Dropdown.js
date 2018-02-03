@@ -4,15 +4,18 @@ import Up from './svgs/up.js'
 
 export default class DropDown extends React.Component {
     willEnter() {
-
       return {
-        transform: 100
+        transform: 120
       }
     }
     willLeave() {
       return {
-        transform: spring(100)
+        transform: spring(120)
       }
+    }
+
+    shouldComponentUpdate(nextProps){
+      return this.props.doUnmount !== nextProps.doUnmount
     }
     render() {
       {
@@ -34,7 +37,9 @@ export default class DropDown extends React.Component {
                     transform: 'translate3d(0, -' + item.style.transform + 'vh, 0)'
                   }}>
                     {this.props.renderContent}
-                    <Up style={"up"} toggleDropDown={this.props.toggleDropDown}/>
+                    <div className="upToggleContainer" onClick={this.props.toggleDropDown} onTouchMove={this.props.toggleDropDown}>
+                      <Up style={"up"}/>
+                    </div>
                     </div>
                   );
                 })}

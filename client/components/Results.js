@@ -13,66 +13,43 @@ class Results extends Component  {
       this.state = {songs: null}
     }
 
-  // componentDidMount() {
-  //   this.search()
-  //   // params injected via react-router, dispatch injected via connect
-  // }
+
+  shouldComponentUpdate(nextProps, nextState){
+    // console.log(this.state, nextState)
+    return this.state.songs !== nextState.songs
+    
+  }
 
   componentDidMount(){
-    console.log(this.props)
+    this.renderReturns(this.props.query)
   }
 
-  search(){
-    const {dispatch} = this.props;
-    dispatch(search(this.props.query))
-  }
-
-  // componentWillReceiveProps(){
-
-  // }
-
-  // shouldComponentUpdate(){
-  //   console.log(this.props.tracks)
-  //   if(!(this.props.tracks.loading) && this.props.tracks){
-  //     alert('ran')
-  //     console.log(this.props.tracks)
-  //     const songList = this.props.tracks.tracks.items.map((info) =>
-  //         <h1>
-  //           d;lamsd
-  //         </h1>
-  //     );
-  //     this.setState({ songs: songList})
-  //   }
-  // }
-
-
-  renderReturns(){
-    let songList = "No Results";
-    // console.log(this.props.tracks.tracks.items)
-      // console.log(this.props.tracks)
-
-    if (this.props.tracks.tracks){
-      songList = this.props.tracks.tracks.items.map((info) =>
-        <Songresult userId={this.props.user.id} postSong={postSong} addToPlaylist={addToPlaylist} info = {info} key ={info.id}/>
-      );
+  componentWillReceiveProps(nextProps){
+    // console.log(this.props.querynextProps)
+     if(this.props.query !== nextProps.query){
+      this.renderReturns(nextProps.query)
     }
-    return songList
+  }
+  renderReturns(query){
+    search(query).then((data) => {
+      let songList = "No Results";
+        songList = data.tracks.items.map((info) =>
+          <Songresult userId={this.props.user.id} postSong={postSong} addToPlaylist={addToPlaylist} info = {info} key ={info.id}/>
+        );
+      this.setState({songs: songList})
+    })
   }
 
 
 
   render() {
-    console.log(this.props)
-    if(this.props.enterDown){
-      this.search();
-      this.props.enterUp()
-    }
+    console.log(this.state)
     return (
       <div className="results">
         <h2 className="searchText">
           Search Results<span className="periodSmaller">.</span>
         </h2>
-        {this.props.tracks.loading ? <h1>Loading</h1> : this.renderReturns()}
+        {this.props.tracks.loading ? <h1>Loading</h1> : this.state.songs}
       </div>
     );
 

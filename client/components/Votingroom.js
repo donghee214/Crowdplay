@@ -9,6 +9,9 @@ import {
   watchGuestAddedEvent,
   watchChildRemoved,
   voteListener,
+  play,
+  pause,
+  nextSong
 } from '../actions/actions'
 
 class Votingroom extends Component  {
@@ -27,12 +30,28 @@ class Votingroom extends Component  {
         '7':[0,200],
         '8':[50,200],
         }
-
       }
-
     }
     componentDidMount(){
        this.props.onOrderSongs();
+    }
+
+    pauseSong(){
+      this.props.pause()
+    }
+
+    play(){
+      this.props.play()
+    }
+
+    nextSong(context){
+      nextSong()
+    }
+
+    shouldComponentUpdate(nextProps){
+      console.log(this.props)
+      console.log(nextProps)
+      return this.props.Votingroom.list !== nextProps.Votingroom.list
     }
 
   render() {
@@ -46,15 +65,14 @@ class Votingroom extends Component  {
 
       <div>
         <div className="currentlyPlaying">
-          <Header /> 
-          <FirstSong isPlaying ={this.state.isPlaying} firstSong={this.props.Votingroom.list[0]}  background={this.props.Votingroom.currentSong.picture} timebox={this.props.Votingroom.currentSong.time} artist ={this.props.Votingroom.currentSong.artist} title={this.props.Votingroom.currentSong.name} roomType={this.props.roomType}/>
+          <Header roomName={this.props.room.roomName}/> 
+          <FirstSong isPlaying ={this.props.isPlaying} play={this.nextSong.bind(this)} pause={this.pauseSong.bind(this)} pausefirstSong={this.props.Votingroom.list[0]}  background={this.props.Votingroom.currentSong.picture} timebox={this.props.Votingroom.currentSong.time} artist ={this.props.Votingroom.currentSong.artist} title={this.props.Votingroom.currentSong.name} roomType={this.props.room.roomType}/>
         </div>
         <div style={{display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width:'100%',
                     height: '50vw',
-
           }}>
        
         </div>
@@ -71,7 +89,9 @@ class Votingroom extends Component  {
 
 function mapStateToProps(state) {
   return {
-    Votingroom: state.songList
+    Votingroom: state.songList,
+    room: state.room,
+    isPlaying: state.isPlaying
   };
 }
 
@@ -80,7 +100,15 @@ function mapDispatchToProps(dispatch) {
   voteListener(dispatch);
   watchChildRemoved(dispatch);
     return {
-
+      pause(){
+        return dispatch(pause())
+      },
+      // play(){
+      //   return dispatch(play())
+      // },
+      nextSong(context){
+        return dispatch(nextSong(context))
+      },
     onOrderSongs() {
       return dispatch(orderSongs())
     },

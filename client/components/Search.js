@@ -1,31 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Results from './Results.js'
+import InputSearch from './InputSearch.js';
 
 
 export default class Search extends React.Component  {
   constructor(props){
     super(props)
     this.state ={
-      inputValue : '',
       showResults: false,
-      enterDown: false
+      query: null
     }
   }
-  updateInputValue(event){
-    this.setState({inputValue: event.target.value});
-  }
 
-  enterUp(){
-    this.setState({enterDown: false})
-  }
-
-  search(evt){
-
+  search(evt, query){
+    // alert('called')
+    evt.target.children[0].blur()
     evt.preventDefault();
-    // const {dispatch} = this.props;
-    // dispatch(search(this.state.inputValue))
-    this.setState({showResults:true, enterDown:true})
+    this.setState({showResults:true, query: query})
     return false;
   }
 
@@ -36,12 +28,10 @@ export default class Search extends React.Component  {
       <div className="search">
         <div className="topContent">
           <h3 className="searchHelp">Search for songs, artists, and playlists</h3>
-          <form onSubmit={(e) => this.search(e)}>
-            <input className="inputRoom searchSong" placeholder = "Search" type="text" value={this.state.inputValue} onChange={this.updateInputValue.bind(this)}/>
-          </form>
+          <InputSearch search = {this.search.bind(this)}/>
         </div>
 
-        {this.state.showResults ? <Results enterUp={this.enterUp.bind(this)} enterDown={this.state.enterDown} query={this.state.inputValue}/> : null}
+        {this.state.showResults ? <Results query={this.state.query}/> : null}
       </div>
     );
 

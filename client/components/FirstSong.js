@@ -9,7 +9,7 @@ export default class Firstsong extends React.Component   {
   render() {
     return (
       <div>
-        {this.props.roomType ? <Controls isPlaying={this.props.isPlaying} firstSong={this.props.firstSong} background ={this.props.background}/> : null}
+        {this.props.roomType ? <Controls pause={this.props.pause} play={this.props.play} isPlaying={this.props.isPlaying} firstSong={this.props.firstSong} background ={this.props.background}/> : null}
         <div className="bottomContent" style= {{height:'20%'}}>
           <h1 className="songTitle">
             {this.props.title}

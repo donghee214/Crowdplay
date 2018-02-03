@@ -4,20 +4,13 @@ import Previous from './svgs/previous.js';
 import Pause from './svgs/pause.js';
 import SkipComp from './svgs/SkipComp.js';
 import Play from './svgs/play.js';
-import {
-  pause,
-  skip
-} from '../actions/actions'
 export default class Controls extends React.Component  {
 
-  constructor(props){
-    super(props)
-    this.state = {play: this.props.isPlaying}
-  }
+  // constructor(props){
+  //   super(props)
+  //   this.state = {play: this.props.isPlaying}
+  // }
 
-  toggle(){
-    this.setState({play: !this.state.play})
-  }
 
   // componentDidMount(){
   //   //write cconondition to check database and see if there are any songs
@@ -29,12 +22,11 @@ export default class Controls extends React.Component  {
 
     return (
       <div className="controls" style={{
-        'backgroundImage':`url(${this.props.background})`,
-         boxShadow: 'inset 0 0 0 1000px rgba(0,0,0,.3)',
+          backgroundImage:`linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0), rgba(0,0,0,0.7)), url(${this.props.background})`
       }}>
         <Previous />
-        {this.state.play ? <Pause pauseFunction={pause} toggle={this.toggle.bind(this)}/> : <Play toggle={this.toggle.bind(this)}/>}
-        <SkipComp skip={skip}/>
+        {this.props.isPlaying ? <Pause pauseFunction={this.props.pause}/> : <Play playFunction={this.props.play}/>}
+        <SkipComp playFunction={this.props.play}/>
       </div>
     );
   }

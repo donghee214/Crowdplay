@@ -9,7 +9,8 @@ import Search from './Search.js';
 import {
   setTokens,
   getMyInfo,
-  getDevices
+  createDB,
+  joinDB
 }   from '../actions/actions';
 
 /**
@@ -23,8 +24,9 @@ class Landing extends Component {
         votingRoom: false,
         mainPage: true,
         whatToRenderDropdown: null,
-        roomType: null,
         roomName: null,
+        errorMsg: null,
+        errorMsgStyle: 0,
       }
     }
 
@@ -42,16 +44,45 @@ class Landing extends Component {
   }
 
   createClicked(){
-    this.setState({whatToRenderDropdown: <CreateRoom id={true} showVoting={this.showVoting.bind(this)}/>})
+    this.setState({whatToRenderDropdown: <CreateRoom removeError={this.removeError.bind(this)} errorMsg={this.state.errorMsg} create={this.create.bind(this)}/>})
   }
 
   joinClicked(){
-    this.setState({whatToRenderDropdown: <JoinRoom id={false} showVoting={this.showVoting.bind(this)}/>})
+    this.setState({whatToRenderDropdown: <JoinRoom removeError={this.removeError.bind(this)} errorMsg={this.state.errorMsg} join={this.join.bind(this)}/>})
   }
 
-  showVoting(room, roomName){
-    this.setState({votingRoom: true, roomType: room, roomName: roomName})
-    this.toggleDropDown()
+  create(roomName){
+    const {dispatch} = this.props
+    dispatch(createDB(roomName)).then((result) => {
+      if(result){
+          this.setState({errorMsg:null, votingRoom: true})
+          this.toggleDropDown()
+      }
+      else{
+        this.setState({errorMsg: <h1 className="errorMessage">Roomname is in use<span className="period">.</span></h1>})
+        // console.log(this.state.errorMsgStyle, 'WTFF')
+        // setTimeout(() => {
+        //   this.setState({errorMsgStyle: 0})
+        // }, 1000)
+      }
+    }) 
+  }
+
+  join(roomName){
+    const {dispatch} = this.props
+    dispatch(joinDB(roomName)).then((result) => {
+      if(result){
+          this.setState({errorMsg:null, votingRoom: true})
+          this.toggleDropDown()
+      }
+      else{
+        this.setState({errorMsg: <h1 className="errorMessage">Room does not exist</h1>})
+      }
+    })
+  }
+
+  removeError(){
+    this.setState({errorMsg:null})
   }
 
   searchClicked(){
@@ -59,10 +90,7 @@ class Landing extends Component {
     this.toggleDropDown()
   }
 
-  // eraseHome(){
-  //   alert("fdslkfn")
-  //   this.setState({votingRoom:true})
-  // }
+
 
   /** Render the user's info */
   render() {
@@ -73,8 +101,9 @@ class Landing extends Component {
     }
     return (
       <div>
+        {this.state.errorMsg}
         <Dropdown renderContent = {this.state.whatToRenderDropdown} toggleDropDown={this.toggleDropDown.bind(this)} doUnmount={this.state.mainPage}/>
-        {this.state.votingRoom ? <VotingRoom searchClicked={this.searchClicked.bind(this)}roomName ={this.state.roomName} roomType={this.state.roomType}/> : <Home dropPayload={dropPayload}/>}
+        {this.state.votingRoom ? <VotingRoom searchClicked={this.searchClicked.bind(this)} /> : <Home dropPayload={dropPayload}/>}
       </div>
     );
   }

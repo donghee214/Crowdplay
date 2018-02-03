@@ -1,12 +1,8 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import {
-  play
-} from '../../actions/actions'
+
 export default class Play extends React.Component {
 	clickHandle(){
-		this.props.toggle()
-		play()	
+		this.props.playFunction('play')
 	}
     render() {
 

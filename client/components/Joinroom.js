@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Join from './svgs/join.js'
+import InputBox from './Input.js'
 // import {
 //   getMyInfo,
 //   setTokens,
@@ -12,28 +12,15 @@ import Join from './svgs/join.js'
  */
 export default class Joinroom extends React.Component  {
   /** When we mount, get the tokens from react-router and initiate loading the info */
-  componentDidMount() {
-    // params injected via react-router, dispatch injected via connect
-    // const {dispatch, params} = this.props;
-    // const {accessToken, refreshToken} = params;
-    // dispatch(setTokens({accessToken, refreshToken}));
-
+  shouldComponentUpdate(){
+    return false
   }
 
-  renderSonglist(){
-    this.props.showVoting(this.props.id)
-  }
-
-  /** Render the user's info */
   render() {
-
-
-
     return (
       <div className="createContainer">
         <Join style="createRoom" />
-        <input className="inputRoom" placeholder = "Join room name" type="text"/>
-        <h1 onClick={this.renderSonglist.bind(this)} className="dropButton">Join<span className="period">.</span></h1>
+        <InputBox func ={this.props.join} removeError={this.props.removeError}/>
       </div>
     );
   }

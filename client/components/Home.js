@@ -28,14 +28,9 @@ export default class Home extends React.Component {
       }
     }
   /** When we mount, get the tokens from react-router and initiate loading the info */
-  componentDidMount() {
-    // params injected via react-router, dispatch injected via connect
-    // const {dispatch, params} = this.props;
-    // const {accessToken, refreshToken} = params;
-    // dispatch(setTokens({accessToken, refreshToken}));
-
+  shouldComponentUpdate(){
+    return false
   }
-
   /** Render the user's info */
   render() {
     // const { accessToken, refreshToken, user } = this.props;

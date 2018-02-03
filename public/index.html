@@ -4,8 +4,15 @@
     <title>Name of App</title>
     <meta name="viewport" content="width=device-width, user-scalable=no">
   </head>
-  <body>
+  <body onResize="onResize();">
     <div id="root"></div>
     <script src="bundle.js"></script>
   </body>
 </html>
+<script type="text/javascript">    
+	const height  = document.documentElement.clientHeight;       
+    function onResize(){
+    	document.getElementsByTagName("body")[0].style.height = height+'px';
+    }
+    onResize()
+</script>

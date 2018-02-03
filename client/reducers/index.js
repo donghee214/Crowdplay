@@ -1,7 +1,7 @@
 import {
   SPOTIFY_TOKENS, SPOTIFY_ME_BEGIN, SPOTIFY_ME_SUCCESS, SPOTIFY_ME_FAILURE, SPOTIFY_SEARCH_LOADING,SPOTIFY_SEARCH_DONE, SONGS
   ,GETSONGS_BEGIN, GETSONGS_END, ADD_SONGS,TOGGLE_LOADSONGS, ADD_SONGS_DONE, UPDATE_VOTE, PLAYBACK_PLAYING,
-  REMOVE_SONGS, CHANGE_CURRENTSONG
+  REMOVE_SONGS, CHANGE_CURRENTSONG, SET_ROOMNAME, JOIN_ROOMNAME, TOGGLE_SONG
 } from '../actions/actions';
 import update from 'immutability-helper';
 
@@ -11,6 +11,11 @@ const initialState = {
   accessToken: null,
   refreshToken: null,
   playback: false,
+  room: {
+    roomName: 'aw fuck',
+    roomType: false,
+  },
+  isPlaying:false,
   songList: {
     loading: null,
     add:null,
@@ -95,10 +100,10 @@ export default function reduce(state = initialState, action) {
     });
 
   case ADD_SONGS:
-    let newArr = state.songList.list.slice(0)
-    newArr.push(action.data)
+    // let newArr = state.songList.list.slice(0)
+    // newArr.push(action.data)
     return Object.assign({}, state, {
-      songList: Object.assign({}, {list: newArr}, {loading: false}, {type:'song'}, {user: state.user.id}, {currentSong: state.songList.currentSong})
+      songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id}, {currentSong: state.songList.currentSong})
     });
 
   case ADD_SONGS_DONE:
@@ -132,19 +137,28 @@ export default function reduce(state = initialState, action) {
         }})
     });
   case UPDATE_VOTE:
-    for(let i = 0; i < state.songList.list.length; i++){
-      if(state.songList.list[i].songId === action.data.songId){
-        return update(state,{
+      return update(state,{
           songList: {list: {
-            [i]: {
+            [action.index]: {
               votecount:{$set: action.data.votecount},
               voters: {$set: action.data.voters}
             }
           }}
         })
-      }
-    }
-   
+  
+
+  case SET_ROOMNAME:
+    return Object.assign({}, state, {
+      room: Object.assign({},  {roomName: action.data}, {roomType: true}),
+    });
+  case JOIN_ROOMNAME:
+    return Object.assign({}, state, {
+      room: Object.assign({},  {roomName: action.data[0]}, {roomType: false}),
+    });
+  case TOGGLE_SONG:
+    return Object.assign({}, state, {
+      isPlaying: action.data,
+    });
   default:
     return state
   }

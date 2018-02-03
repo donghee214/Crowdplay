@@ -23,6 +23,10 @@ export const TOGGLE_LOADSONGS = 'TOGGLE_LOADSONGS';
 export const PLAYBACK_PLAYING = 'PLAYBACK_PLAYING';
 export const REMOVE_SONGS = 'REMOVE_SONGS';
 export const CHANGE_CURRENTSONG = "CHANGE_CURRENTSONG";
+export const SET_ROOMNAME = "SET_ROOMNAME";
+export const JOIN_ROOMNAME = "JOIN_ROOMNAME";
+export const TOGGLE_SONG = "TOGGLE_SONG";
+
 /** set the app's access and refresh tokens */
 export function setTokens({accessToken, refreshToken}) {
   if (accessToken) {
@@ -32,13 +36,12 @@ export function setTokens({accessToken, refreshToken}) {
 }
 
 
-function refresh() {
+const refresh = function(){
      spotifyApi.getMyCurrentPlayingTrack().then(function(data){
-      // console.log(data)
+      console.log(data)
       if(data.item.duration_ms - data.progress_ms < 7500){
         setTimeout(function(){
-          // console.log('NEXT IS CALLED')
-          nextSong()
+         nextSong()
           }, 500);
       }
       else{
@@ -47,55 +50,99 @@ function refresh() {
      })
 }
 
-export function play(){
-   let orderedlist =[];
-   return nextSong()
-   // database.ref('songs/').once('value').then(snapshot => {
-   //    orderedlist = Object.values(snapshot.val());
-   //    orderedlist.sort(function(a,b) {
-   //      return b.votecount - a.votecount;
-   //    });
-   //      return nextSong(orderedlist[0].uri, null)
-   //  }).catch(e => {
-   //    console.log(e)
-   //  });
+export function nextSong(context){    
+      clearInterval(refresh)
+      let orderedlist =[];
+      database.ref(roomId+'/songs/').once('value').then(snapshot => {
+      let aux = snapshot.val()
+      // console.log(snapshot.val(), 'AHHHHHHHHH')
+      if(aux){
+          orderedlist = Object.values(aux);
+          orderedlist.sort(function(a,b) {
+            return b.votecount - a.votecount;
+        });
+        spotifyApi.play({"uris": [orderedlist[0].uri]}).then((res) => {
+            database.ref(roomId+'/currentlyPlaying/').set({
+              songInfo: orderedlist[0]
+            })
+            setTimeout(refresh, 5000)
+          }).catch(e => {
+            console.log('CAUGHT SOME ERROR')
+            console.log(e)
+        })
+        database.ref(roomId+'/songs/' + orderedlist[0].songId).remove() 
+      }
+      else{
+        console.log('no more songs')
+      }
+      }).catch(e => {
+          console.log(e)
+      });
+    
 }
 
-let updateArr = []
-function nextSong(){
-      let orderedlist =[];
-      database.ref('songs/').once('value').then(snapshot => {
-      orderedlist = Object.values(snapshot.val());
-      orderedlist.sort(function(a,b) {
-        return b.votecount - a.votecount;
-      });
-        // console.log("FIRST SONG IN DB", orderedlist[0]);
-        //dispatch the orderedlist but while still keeping the song about to be played
-        //remove that song in index.js and dispatch the new orderedlis
-        updateArr = orderedlist.slice(1, orderedlist.length)
-        // dispatch({ type: GETSONGS_END, data: newOrderedList})
-        spotifyApi.play({"uris": [orderedlist[0].uri]}).then(() => setTimeout(refresh, 5000))
-        database.ref('songs/' + orderedlist[0].songId).remove()
-      }).catch(e => {
-        console.log(e)
-      });
+export function play(){
+  return dispatch => {
+    let orderedlist =[];
+    database.ref(roomId+'/isPlaying/').set({
+        isPlaying: true
+    })
+    dispatch({type: TOGGLE_SONG, data: true})
+   return nextSong()
+  }
+
+}
+
+export function pause(){
+  return dispatch => {
+    spotifyApi.pause({})
+     database.ref(roomId+'/isPlaying/').set({
+        isPlaying: false
+    })
+    dispatch({type: TOGGLE_SONG, data: false})
+  }
+ 
+}
+
+let updateArr = [];
+let roomId = null;
+let songList = []
+
+export function watchChildRemoved(dispatch) {
+  database.ref(roomId+'/songs/').on('child_removed', (snapshot) => {
+    console.log(snapshot.val(), songList)
+    for(let i = 0; i < songList.length; i++){
+      if(songList[i].songId === snapshot.val().songId){
+        songList.splice(i, 1)
+      }
+    }
+    dispatch({ type: REMOVE_SONGS, data: songList});
+    dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+  });
+}
+
+
+
+
+// export function watchChildRemovedJoin(dispatch) {
+//   database.ref(roomId+'/songs/').on('child_removed', (snapshot) => {
+//     console.log('CHILD REMOVED', updateArr)
+//     dispatch({ type: REMOVE_SONGS, data: updateArr});
+//     dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+//   });
+// }
+
+function sort(arr){
+
 }
 
 export function skip(){
    nextSong()
 }
 
-export function watchChildRemoved(dispatch) {
-  database.ref('songs/').on('child_removed', (snapshot) => {
-    // console.log('CURRENTLY PLAYING', snapshot.val())
-    dispatch({ type: REMOVE_SONGS, data: updateArr});
-    dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
-    // console.log('CHILD HAS BEEN REMOVED', snapshot.val())
-  });
-}
 
 // initial call, or just call refresh directly
-setTimeout(refresh, 5000);
+// setTimeout(refresh, 5000);
 // const config = {
 //   apiKey: "AIzaSyCWfDeoXue1YnVRZGXiy9q3M2A2-PknkbY",
 //   authDomain: "nextup-9685a.firebaseapp.com",
@@ -131,8 +178,14 @@ export function addSongsDone(){
 }
 
 export function watchGuestAddedEvent(dispatch) {
-  database.ref('songs/').on('child_added', (snapshot) => {
-    dispatch({ type: ADD_SONGS, data: snapshot.val()});
+
+//   var ref = db.ref("dinosaurs");
+//   ref.orderByChild("height").on("child_added", function(snapshot) {
+//   console.log(snapshot.key + " was " + snapshot.val().height + " meters tall");
+// });
+  database.ref(roomId+'/songs').on('child_added', function(snapshot){
+    songList.push(snapshot.val())
+    dispatch({ type: ADD_SONGS, data: songList});
     // console.log('CHILD HAS BEEN ADDED', snapshot.val())
   });
 }
@@ -140,19 +193,69 @@ export function watchGuestAddedEvent(dispatch) {
 
 
 export function voteListener(dispatch) {
-  database.ref('songs/').on('child_changed', (snapshot) => {
-    dispatch({ type: UPDATE_VOTE, data: snapshot.val()});
+  database.ref(roomId+'/songs/').on('child_changed', (snapshot) => {
+
+    for(var i = 0; i < songList.length; i++){
+
+      if(songList[i].songId === snapshot.val().songId){
+        songList[i] = snapshot.val()
+        dispatch({ type: UPDATE_VOTE, data: snapshot.val(), index: i});
+      }
+    }
+    // console.log(songList[i], i)
+   
   });
 }
 
-
-
-export function addSongToQueue(){
-  spotifyApi.addTracksToPlaylist(userId, playlistId, orderedlist[0].uri).then(()=> nextSong())
+export function createDB(roomName){
+  return dispatch => {
+    return database.ref('/').once('value').then(snapshot => {
+        if(snapshot.val() && roomName in snapshot.val()){
+          return false
+        }
+        roomId = roomName;
+        database.ref(roomId + '/people').set({
+          host: userId
+        })
+        dispatch({type : SET_ROOMNAME, data: roomId})
+        return true
+    }) 
+  }
 }
 
+export function joinDB(roomName){
+  return dispatch => {
+    return database.ref('/').once('value').then(snapshot => {
+        const rooms = snapshot.val()
+        if(snapshot.val() && roomName in rooms){
+          roomId = roomName;
+          database.ref(roomId+'/currentlyPlaying/songInfo/').once('value').then(snapshot => {
+             dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+
+          })
+          database.ref(roomId+'/isPlaying/').once('value').then(snapshot => {
+             dispatch({ type: TOGGLE_SONG, data: snapshot.val()});
+          })
+          if(userId == rooms[roomName].people.host){
+            dispatch({type : SET_ROOMNAME, data: roomId})
+            return true
+          }
+          else{
+            dispatch({type : JOIN_ROOMNAME, data: roomId})
+            return true
+          }
+        }
+        return false
+    }) 
+  }
+}
+
+// export function addSongToQueue(){
+//   spotifyApi.addTracksToPlaylist(userId, playlistId, orderedlist[0].uri).then(()=> nextSong())
+// }
+
 export function postSong(name, artist, time, picture, id, uri, userId){
-    database.ref('songs/'+ id).set({
+    database.ref(roomId + '/songs/'+ id).set({
       SongName:name,
         artist:artist,
         time:time,
@@ -164,7 +267,7 @@ export function postSong(name, artist, time, picture, id, uri, userId){
         voters: {[userId]: true}
      })
   // console.log('ran')
-/*  database.ref('songs/').once('value').then(function(snapshot) {
+/*  database.ref('/songs/').once('value').then(function(snapshot) {
       var num = snapshot.numChildren();
       if(num === 1){
         let orderedlist = [];
@@ -184,26 +287,20 @@ export function postSong(name, artist, time, picture, id, uri, userId){
 
 
 export function orderSongs(){
-
-      // database.ref('playlist/').once('value').then(snapshot => {
-      //    console.log('ORDERSONGS', snapshot.val())
-      //           playlistId = snapshot.val().playlistId
-      //           playlistUri = snapshot.val().uri
-      //   })
-
    return dispatch => {
          let orderedlist = [];
         dispatch({ type: GETSONGS_BEGIN});
-        return database.ref('songs/').once('value').then(snapshot => {
+        return database.ref(roomId + '/songs/').once('value').then(snapshot => {
           orderedlist = Object.values(snapshot.val());
           // console.log(orderedlist)
           orderedlist.sort(function(a,b) {
             return b.votecount - a.votecount;
           });
+          songList = orderedlist
 
-          dispatch({ type: GETSONGS_END, data: orderedlist });
+          dispatch({ type: GETSONGS_END, data: songList });
         }).catch(e => {
-          dispatch({ type: GETSONGS_END, data: orderedlist });
+          dispatch({ type: GETSONGS_END, data: songList });
         });
     
   }
@@ -217,13 +314,13 @@ export function toggleLoadSongs(){
 
 
 export function getVote(){
-  database.ref('songs/').on('child_changed', function(snapshot){
+  database.ref(roomId + '/songs/').on('child_changed', function(snapshot){
     // console.log(snapshot.val())
   })
 
 }
 
-  database.ref('songs/').on('child_changed', function(snapshot){
+  database.ref(roomId + '/songs/').on('child_changed', function(snapshot){
     return dispatch => {
       // console.log(snapshot.val())
       dispatch({ type: SONGS, data: snapshot.val() });
@@ -237,7 +334,7 @@ export function getVote(){
 //   }
 // }
 // const fromDb = (db, dispatch) => {
-//   db.ref('songs/').on('value', data => {
+//   db.ref('/songs/').on('value', data => {
 //     console.log('1')
 //     if (data.val()) {
 //       console.log('dasd')
@@ -249,7 +346,7 @@ export function getVote(){
 
 // export function getNumOfSongs(uri){
 //   let orderedlist = [];
-//    database.ref('songs/').once('value').then(function(snapshot){
+//    database.ref('/songs/').once('value').then(function(snapshot){
 //       orderedlist = Object.values(snapshot.val());
 //       orderedlist.sort(function(a,b) {
 //          return b.votecount - a.votecount;
@@ -265,7 +362,7 @@ export function getVote(){
 // let num;
 // export function getNum(){
 //   let val;
-//    database.ref('songs/').once('value').then(function(snapshot){
+//    database.ref('/songs/').once('value').then(function(snapshot){
 //       console.log(snapshot.val())
 //       if (snapshot.val() == null){
 //         return 'fdsfndksflnd'
@@ -278,7 +375,7 @@ export function getVote(){
 
 export function order(){
     let orderedlist = [];
-    return  database.ref('songs/').once('value').then(function(snapshot){
+    return  database.ref(roomId+ '/songs/').once('value').then(function(snapshot){
         orderedlist = Object.values(snapshot.val());
         orderedlist.sort(function(a,b) {
           return b.votecount - a.votecount;
@@ -294,7 +391,7 @@ export function order(){
 // function orderSongs(){
 //   let orderedlist = [];
 //     // dispatch({ type: SPOTIFY_SEARCH_LOADING});
-//     database.ref('songs/').once('value').then(function(snapshot){
+//     database.ref('/songs/').once('value').then(function(snapshot){
 //       orderedlist = Object.values(snapshot.val());
 //       orderedlist.sort(function(a,b) {
 //          return b.votecount - a.votecount;
@@ -304,14 +401,11 @@ export function order(){
 //     return orderedlist
 // }
 
-export function getId(){            
-  return userId
-}
 
 export function increment(id, user_id3){
 
-  var ref = database.ref('songs/' + id);
-  database.ref('songs/'+ id).once('value').then(function(snapshot){
+  var ref = database.ref(roomId+'/songs/' + id);
+  database.ref(roomId+'/songs/'+ id).once('value').then(function(snapshot){
     const song = snapshot.val()
     ref.transaction(function(song) {
       if (song) {
@@ -388,7 +482,7 @@ export function getMyInfo() {
 
 
 export function remove(id){
-  database.ref('songs/' + id).remove();
+  database.ref(roomId+'/songs/' + id).remove();
 }
 
 export function addToPlaylist(id, dummy, uri){
@@ -449,15 +543,12 @@ export function addToPlaylist(id, dummy, uri){
 // }
 
 export function search(query){
-  return dispatch => {
-    dispatch({ type: SPOTIFY_SEARCH_LOADING});
-    spotifyApi.search(query, 'track').then(function(data){
+  return spotifyApi.search(query, 'track').then(function(data){
       console.log(data)
-      dispatch({type: SPOTIFY_SEARCH_DONE, data: data});
+      return data
     }).catch(e => {
-      dispatch({ type: SPOTIFY_SEARCH_LOADING, error: e });
+     
     });
-  }
 }
 
 // export function pause(){
@@ -490,10 +581,7 @@ export function getCurrent(){
 
 // });
 
-export function pause(){
 
-    spotifyApi.pause({})
-}
 
 
 

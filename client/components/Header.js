@@ -21,7 +21,7 @@ export default class Header extends React.Component  {
 	        <h3>
 	        	Room Name:
 	        </h3>
-        	<h1 className="roomHead">Dan's Room</h1>
+        	<h1 className="roomHead">{this.props.roomName}</h1>
        	
         </div>
         <Share/>

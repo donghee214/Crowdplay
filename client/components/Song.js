@@ -13,18 +13,26 @@ export default class Song extends React.Component{
   toggle(){
     increment(this.props.info.songId, this.props.userId);
   }
+  returnTime(){
+    let seconds = this.props.info.time/1000;
+    let minutes = Math.floor(seconds/60);
+    seconds = Math.floor(seconds % 60);
+    return <h3 className="timeBox">{minutes}:{seconds}</h3>
+  }
 
+
+  shouldComponentUpdate(nextProps){
+    return this.props.votes !== nextProps.votes
+  }
 
   render() {
-    console.log(this.props)
     return (
-
         <Motion style={{ x: spring(true ? -8 : 11) }}>
             {value => {
                 return <div className="songBox" style={{
-                  background:`rgba(0,0,0,0.5) url(${this.props.info.picture})`,
+                  backgroundImage:`url(${this.props.info.picture})`,
+                  boxShadow: "inset 0 0 0 1000px rgba(0,0,0,0.5)",
                   top: 0,
-                  boxShadow: 'inset 0 0 0 1000px rgba(0,0,0,.3)',
                   backgroundPosition:'center',
                   backgroundSize:'contain',
                   left:0,
@@ -48,7 +56,7 @@ export default class Song extends React.Component{
                       {this.props.info.artist[0].name}
                     </h2>
                     <h3 className="timeBox">
-                      {this.props.info.time}
+                      {this.returnTime()}
                     </h3>
                   </div>
                 </div>
