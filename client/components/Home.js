@@ -33,15 +33,6 @@ export default class Home extends React.Component {
   }
   /** Render the user's info */
   render() {
-    // const { accessToken, refreshToken, user } = this.props;
-    // const { loading, display_name, images, id, email, external_urls, href, country, product } = user;
-    // const imageUrl = images[0] ? images[0].url : "";
-    // if we're still loading, indicate such
-    // if (loading) {
-    //   return <h2>Loading...</h2>;
-    // }
-
-
     return (
       <div className="landing">
         <h1 className="title"> 

@@ -6,14 +6,13 @@ import Added from './svgs/added.js';
 export default class Songresult extends React.Component  {
   constructor(props){
     super(props)
-    this.state = {added:false}
+    this.state = {added:this.props.info.added}
+    // console.log(this.props.info)
   }
 
   addSong(){
     this.setState({added:true})
-    this.props.addToPlaylist(this.props.info.id, "dummy", this.props.info.uri)
-    this.props.postSong(this.props.info.name, this.props.info.artists, this.props.info.duration_ms, this.props.info.album.images[0].url, this.props.info.id, this.props.info.uri, this.props.userId)
-
+    this.props.postSong(this.props.info.name, this.props.info.artists, this.props.info.duration_ms, this.props.info.album.images[0].url, this.props.info.id, this.props.info.uri)
   }
 
   removeSong(){
@@ -29,6 +28,10 @@ export default class Songresult extends React.Component  {
     return artistList
   }
 
+  shouldComponentUpdate(nextState){
+    return this.state.added !== nextState.added
+  }
+
   returnTime(){
     let seconds = this.props.info.duration_ms/1000;
     let minutes = Math.floor(seconds/60);
@@ -37,7 +40,7 @@ export default class Songresult extends React.Component  {
   }
   render() {
     return (
-      <div className="songResult">
+      <div className="songResult" onClick = {this.addSong.bind(this)}>
         <h1 className="searchTitle">
           {this.props.info.name}
         </h1>
@@ -45,7 +48,7 @@ export default class Songresult extends React.Component  {
           {this.returnArtist()}
         </div>
         {this.returnTime()}
-        {this.state.added ? <Added removeSong={this.removeSong.bind(this)}/>: <NotAdded addSong={this.addSong.bind(this)}/>}
+        {this.state.added ? <Added/>: <NotAdded/>}
       </div>
     );
   }

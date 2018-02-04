@@ -22,7 +22,9 @@ export default class Song extends React.Component{
 
 
   shouldComponentUpdate(nextProps){
-    return this.props.votes !== nextProps.votes
+    const voteChanged = this.props.votes !== nextProps.votes
+    const positionChanged = this.props.position !== nextProps.position
+    return voteChanged || positionChanged
   }
 
   render() {

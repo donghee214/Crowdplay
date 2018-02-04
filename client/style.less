@@ -50,40 +50,82 @@ body{
     margin-top: 5px;
 }
 
+.devicesList{
+  display: inherit;
+  flex-direction: inherit;
+  align-items: flex-start;
+  width: 100%;
+    padding: 0 9vw 0 9vw;
+    box-sizing: border-box;
+}
 
 
 .visible{
   opacity: 1;
 }
 
+.deviceName{
+  font-size: 17px;
+  margin: 0;
+}
+
+.deviceType{
+  margin: 0;
+    font-size: 15px;
+    font-weight: 300;
+    color: lightgrey;
+}
+
 .invisible{
   opacity: 0;
 }
 
-/* .refresh{
-    width: 60px;
-    height: 60px;
-    border: 1px solid #FF3366;
-    margin-top:50vh;
-    z-index: 1;
-    color: black;
-    border-radius: 50%;
-    height: 5%;
-    top: 37%;
-   
-    width: 35px;
-    height: 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.refresh{
+  width: 100px;
+  height: 100px;
+  margin-top: 15vh;
 }
- */
 .setting{
-  position: absolute;
-  left: 5%;
-  top: 20%;
+  fill: #FFFFFF;
+   width: 35px;
+  height: 35px;
+}
+
+.devices{
+  font-size: 10px;
+   overflow: hidden;
+    text-overflow: ellipsis; 
+    margin: 0;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.noDevice{
+    font-size: 10px;
+   overflow: hidden;
+    text-overflow: ellipsis; 
+    margin: 0;
+    white-space: nowrap;
+    max-width: 100%;
+    color: #FFF;
+}
+
+.settingContain{
+      position: absolute;
+    left: 4%;
+    top: 10%;
+    width: 55px;
+    height: 55px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.settingGreen{
   width: 35px;
   height: 35px;
+  fill: #1ED760;
 }
 
 .upNext{
@@ -100,6 +142,19 @@ body{
   position: absolute;
     background-position: center !important;
     background-size: contain !important;
+}
+
+.deviceOptionBox{
+  width: 100%;
+  position: relative;
+}
+
+.playing{
+  position: absolute;
+  top: calc(~'50% - 17.5px');
+  height: 35px;
+  width: 35px;
+  right: 0%;
 }
 
 .contain{
@@ -122,10 +177,36 @@ body{
   fill: white;
 }
 
-.share{
-  position: absolute;
+.instru{
+  text-align: center;
+  font-size: 18px;
+  width: 100%;
+  padding: 0 18vw 0 18vw;
+  box-sizing: border-box;
+  font-weight: 300;
+}
+
+.shareContain{
+    position: absolute;
   right: 5%;
-  top: 20%;
+  top: 10%;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.devicesView{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.share{
+
   width: 35px;
   height: 35px;
 }

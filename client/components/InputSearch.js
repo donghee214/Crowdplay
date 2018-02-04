@@ -11,6 +11,7 @@ export default class InputSearch extends React.Component  {
 
   updateInputValue(event){
     this.setState({inputValue: event.target.value});
+    this.props.search(null, event.target.value)
   }
 
   // search(evt){
@@ -22,7 +23,7 @@ export default class InputSearch extends React.Component  {
   //   return false;
   // }
   clickHandle(evt){
-    this.props.search(evt, this.state.inputValue)
+     this.props.search(evt, this.state.inputValue)
   }
   // constructor(props){
   //   super(props)

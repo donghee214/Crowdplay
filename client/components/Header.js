@@ -13,10 +13,13 @@ import Share from './svgs/share.js';
  * Displays the user's information
  */
 export default class Header extends React.Component  {
+  shouldComponentUpdate(nextProps){
+    return this.props.device !== nextProps.device
+  }
   render() {
     return (
       <div className="header">
-      	<Setting />
+      	<Setting devicesClicked={this.props.devicesClicked} device={this.props.device}/>
         <div className="titleContainer">
 	        <h3>
 	        	Room Name:

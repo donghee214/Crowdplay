@@ -4,7 +4,7 @@ import React from 'react';
 export default class Added extends React.Component {
     render() {
         return (
-			<svg onClick={this.props.removeSong} fill="#1ED760" className="notadded" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+			<svg fill="#1ED760" className="notadded" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 			    <defs>
 			        <path d="M0 0h24v24H0V0z" id="a"/>
 			    </defs>

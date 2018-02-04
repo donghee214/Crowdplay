@@ -6,6 +6,11 @@ export default class Firstsong extends React.Component   {
   //     super(props)
   //     this.state = {noSongs: true, title:'No Song Chosen', artist: null, timeBox:null, background:null}
   //   }
+  shouldComponentUpdate(nextProps){
+    const songChange = this.props.title !== nextProps.title;
+    const pauseChange = this.props.isPlaying !== nextProps.isPlaying;
+    return songChange || pauseChange
+  }
   render() {
     return (
       <div>

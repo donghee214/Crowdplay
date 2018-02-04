@@ -15,11 +15,15 @@ export default class Search extends React.Component  {
 
   search(evt, query){
     // alert('called')
-    evt.target.children[0].blur()
-    evt.preventDefault();
+    if(evt){
+      evt.target.children[0].blur()
+      evt.preventDefault();
+    }
+
     this.setState({showResults:true, query: query})
     return false;
   }
+
 
 
 
@@ -30,7 +34,6 @@ export default class Search extends React.Component  {
           <h3 className="searchHelp">Search for songs, artists, and playlists</h3>
           <InputSearch search = {this.search.bind(this)}/>
         </div>
-
         {this.state.showResults ? <Results query={this.state.query}/> : null}
       </div>
     );

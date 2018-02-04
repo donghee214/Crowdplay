@@ -1,7 +1,7 @@
 import {
   SPOTIFY_TOKENS, SPOTIFY_ME_BEGIN, SPOTIFY_ME_SUCCESS, SPOTIFY_ME_FAILURE, SPOTIFY_SEARCH_LOADING,SPOTIFY_SEARCH_DONE, SONGS
   ,GETSONGS_BEGIN, GETSONGS_END, ADD_SONGS,TOGGLE_LOADSONGS, ADD_SONGS_DONE, UPDATE_VOTE, PLAYBACK_PLAYING,
-  REMOVE_SONGS, CHANGE_CURRENTSONG, SET_ROOMNAME, JOIN_ROOMNAME, TOGGLE_SONG
+  REMOVE_SONGS, CHANGE_CURRENTSONG, SET_ROOMNAME, JOIN_ROOMNAME, TOGGLE_SONG, DEVICES
 } from '../actions/actions';
 import update from 'immutability-helper';
 
@@ -16,19 +16,20 @@ const initialState = {
     roomType: false,
   },
   isPlaying:false,
+  currentSong: {
+      name: "No Song",
+      artist: null,
+      time: null,
+      picture: null
+  },
   songList: {
     loading: null,
     add:null,
     done: null,
     list: [],
-    currentSong: {
-      name: "No Song",
-      artist: null,
-      time: null,
-      picture: null
-    },
     reloadAll: null
   },
+  device: null,
   user: {
     loading: false,
     country: null,
@@ -96,19 +97,19 @@ export default function reduce(state = initialState, action) {
 
   case GETSONGS_END:
     return Object.assign({}, state, {
-      songList: Object.assign({}, {list:action.data}, {loading: false}, {reloadAll:true}, {user: state.user.id}, {currentSong: state.songList.currentSong})
+      songList: Object.assign({}, {list:action.data}, {loading: false}, {reloadAll:true}, {user: state.user.id})
     });
 
   case ADD_SONGS:
     // let newArr = state.songList.list.slice(0)
     // newArr.push(action.data)
     return Object.assign({}, state, {
-      songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id}, {currentSong: state.songList.currentSong})
+      songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id})
     });
 
   case ADD_SONGS_DONE:
     return Object.assign({}, state, {
-      songList: Object.assign({}, {list: state.songList.list}, {loading: false}, {add:false}, {user: state.user.id}, {currentSong: state.songList.currentSong})
+      songList: Object.assign({}, {list: state.songList.list}, {loading: false}, {add:false}, {user: state.user.id})
     });
 
   case TOGGLE_LOADSONGS:
@@ -123,18 +124,16 @@ export default function reduce(state = initialState, action) {
 
   case REMOVE_SONGS:
     return Object.assign({}, state, {
-      songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id}, {currentSong: state.songList.currentSong})
+      songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id})
     });
 
   case CHANGE_CURRENTSONG:
     return Object.assign({}, state, {
-      songList: Object.assign({}, {list: state.songList.list}, {loading: false}, {type:'song'}, {user: state.user.id}, 
-        {currentSong: {
-          name: action.data.SongName,
-          artist: action.data.artist[0].name,
-          time: action.data.time,
-          picture: action.data.picture
-        }})
+      currentSong: Object.assign({}, {name: action.data.SongName},
+          {artist: action.data.artist[0].name},
+          {time: action.data.time},
+          {picture: action.data.picture}
+        )
     });
   case UPDATE_VOTE:
       return update(state,{
@@ -156,8 +155,14 @@ export default function reduce(state = initialState, action) {
       room: Object.assign({},  {roomName: action.data[0]}, {roomType: false}),
     });
   case TOGGLE_SONG:
+    // console.log(action.data)
     return Object.assign({}, state, {
       isPlaying: action.data,
+    });
+  case DEVICES:
+    // console.log(action.data)
+    return Object.assign({}, state, {
+      device: action.data
     });
   default:
     return state

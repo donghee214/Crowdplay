@@ -4,7 +4,6 @@ import Songresult from './Songresult.js'
 import {
   search,
   postSong,
-  addToPlaylist
 }   from '../actions/actions';
 
 class Results extends Component  {
@@ -33,8 +32,8 @@ class Results extends Component  {
   renderReturns(query){
     search(query).then((data) => {
       let songList = "No Results";
-        songList = data.tracks.items.map((info) =>
-          <Songresult userId={this.props.user.id} postSong={postSong} addToPlaylist={addToPlaylist} info = {info} key ={info.id}/>
+        songList = data.map((info) =>
+          <Songresult postSong={postSong} info = {info} key ={info.id}/>
         );
       this.setState({songs: songList})
     })
@@ -43,7 +42,6 @@ class Results extends Component  {
 
 
   render() {
-    console.log(this.state)
     return (
       <div className="results">
         <h2 className="searchText">

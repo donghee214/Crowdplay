@@ -6,11 +6,13 @@ import CreateRoom from './CreateRoom.js';
 import JoinRoom from './joinRoom.js';
 import VotingRoom from './Votingroom.js';
 import Search from './Search.js';
+import Devices from './Devices.js'
 import {
   setTokens,
   getMyInfo,
   createDB,
-  joinDB
+  joinDB,
+  changeDevice
 }   from '../actions/actions';
 
 /**
@@ -90,9 +92,17 @@ class Landing extends Component {
     this.toggleDropDown()
   }
 
+  devicesClicked(){
+    this.setState({whatToRenderDropdown: <Devices changeDevice={this.changeDevice.bind(this)}/>})
+    this.toggleDropDown()
+  }
 
+  changeDevice(device){
+    const {dispatch} = this.props
 
-  /** Render the user's info */
+    dispatch(changeDevice(device))
+  }
+
   render() {
     const dropPayload = {
         toggleDropDown: this.toggleDropDown.bind(this),
@@ -103,7 +113,7 @@ class Landing extends Component {
       <div>
         {this.state.errorMsg}
         <Dropdown renderContent = {this.state.whatToRenderDropdown} toggleDropDown={this.toggleDropDown.bind(this)} doUnmount={this.state.mainPage}/>
-        {this.state.votingRoom ? <VotingRoom searchClicked={this.searchClicked.bind(this)} /> : <Home dropPayload={dropPayload}/>}
+        {this.state.votingRoom ? <VotingRoom devicesClicked={this.devicesClicked.bind(this)} searchClicked={this.searchClicked.bind(this)} /> : <Home dropPayload={dropPayload}/>}
       </div>
     );
   }
