@@ -291,9 +291,11 @@ export function getDevices(){
 
 export function changeDevice(device){
   return dispatch => {
-    spotifyApi.transferMyPlayback([device.id])
-    activeDevice = device
-    dispatch({type: DEVICES, data: activeDevice})
+    return spotifyApi.transferMyPlayback([device.id]).then(() => {
+        activeDevice = device
+       dispatch({type: DEVICES, data: activeDevice})
+       return
+    })
   }
 }
 

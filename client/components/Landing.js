@@ -99,8 +99,7 @@ class Landing extends Component {
 
   changeDevice(device){
     const {dispatch} = this.props
-
-    dispatch(changeDevice(device))
+    return dispatch(changeDevice(device))
   }
 
   render() {
