@@ -152,7 +152,7 @@ export default function reduce(state = initialState, action) {
     });
   case JOIN_ROOMNAME:
     return Object.assign({}, state, {
-      room: Object.assign({},  {roomName: action.data[0]}, {roomType: false}),
+      room: Object.assign({},  {roomName: action.data}, {roomType: false}),
     });
   case TOGGLE_SONG:
     // console.log(action.data)

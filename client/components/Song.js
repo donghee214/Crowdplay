@@ -42,9 +42,9 @@ export default class Song extends React.Component{
                   transform: `translate3d(${this.props.position[0]}vw, ${this.props.position[1]}vw, 0)`,
                 }}>
                 <div className="votes">
-                  <button>
+                  
                     <Up toggle ={this.toggle.bind(this)} userId={this.props.userId} voters={this.props.info.voters}/>
-                 </button>
+            
                     <h2 className="value">
                       {this.props.votes}
                     </h2>

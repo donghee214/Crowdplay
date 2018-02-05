@@ -1,7 +1,5 @@
 import Spotify from 'spotify-web-api-js';
 import database from '../database.js';
-// import SpotifyWebHelper from 'spotify-web-helper';
-// const helper = SpotifyWebHelper();
 import { dispatch } from 'redux';
 
 const spotifyApi = new Spotify();
@@ -27,7 +25,7 @@ export const SET_ROOMNAME = "SET_ROOMNAME";
 export const JOIN_ROOMNAME = "JOIN_ROOMNAME";
 export const TOGGLE_SONG = "TOGGLE_SONG";
 export const DEVICES = "DEVICES";
-/** set the app's access and refresh tokens */
+
 export function setTokens({accessToken, refreshToken}) {
   if (accessToken) {
     spotifyApi.setAccessToken(accessToken);
@@ -38,11 +36,11 @@ export function setTokens({accessToken, refreshToken}) {
 
 const refresh = function(){
      spotifyApi.getMyCurrentPlayingTrack().then(function(data){
-      console.log(data)
-      if(data.item.duration_ms - data.progress_ms < 7500){
+      console.log("CALLED")
+      if(data.item.duration_ms - data.progress_ms < 5500){
         setTimeout(function(){
          nextSong()
-          }, 500);
+          }, data.item.duration_ms - data.progress_ms - 500);
       }
       else{
         setTimeout(refresh, 5000);
@@ -61,7 +59,7 @@ export function nextSong(context){
           orderedlist.sort(function(a,b) {
             return b.votecount - a.votecount;
         });
-        spotifyApi.play({"uris": [orderedlist[0].uri]}).then((res) => {
+        spotifyApi.play({"uris": [orderedlist[0].uri], "device_id": activeDevice.id}).then((res) => {
             database.ref(roomId+'/currentlyPlaying/').set({
               songInfo: orderedlist[0]
             })
@@ -72,6 +70,7 @@ export function nextSong(context){
         })
         database.ref(roomId+'/songs/' + orderedlist[0].songId).remove() 
       }
+      //show no song remaining
       else{
           spotifyApi.pause({})
           database.ref(roomId+'/currentlyPlaying/').set({
@@ -161,7 +160,6 @@ export function pause(){
     })
     dispatch({type: TOGGLE_SONG, data: false})
   }
- 
 }
 
 let updateArr = [];
@@ -274,6 +272,7 @@ export function createDB(roomName){
         database.ref(roomId + '/people').set({
           host: userId
         })
+        console.log(spotifyApi)
         setDefaultDevice().then(() => {
           dispatch({type: DEVICES, data: activeDevice})
         })
@@ -285,17 +284,23 @@ export function createDB(roomName){
 
 export function getDevices(){
   return spotifyApi.getMyDevices().then((devices) => {
+    // console.log(devices)
     return devices.devices
   })
+}
+
+const ret = function(){
+  console.log('done')
+  return true
 }
 
 export function changeDevice(device){
   return dispatch => {
     return spotifyApi.transferMyPlayback([device.id]).then(() => {
-        activeDevice = device
-       dispatch({type: DEVICES, data: activeDevice})
-       return
+      activeDevice = device
+      dispatch({type: DEVICES, data: activeDevice}) 
     })
+      
   }
 }
 
@@ -378,7 +383,6 @@ export function orderSongs(){
             return b.votecount - a.votecount;
           });
           songList = orderedlist
-
           dispatch({ type: GETSONGS_END, data: songList });
         }).catch(e => {
           dispatch({ type: GETSONGS_END, data: songList });

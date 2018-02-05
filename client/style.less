@@ -20,7 +20,7 @@ h2{
 
 h3{
   color: #1ED760;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 500;
   text-align: center;
   margin: 0;
@@ -36,6 +36,15 @@ body{
   height: -o-calc(1~'100% - 65px'); /* opera */
   height: -webkit-calc(100% - 65px); /* google, safari */
   height: -moz-calc(100% - 65px); /* firefox */
+}
+
+.firstsongContainer{
+    width: 100%;
+    height: 100%;
+    top: 0;
+    position: absolute;
+    background-size: contain;
+    background-position: center;
 }
   
 
@@ -382,7 +391,7 @@ box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
 .artistList{
   font-size: 12px;
   margin: 0;
-  color: #D9D9D9;
+  color: #efefef;
   margin: 0 10px 0 0px;
   font-weight: 300;
     font-family: 'Montserrat', sans-serif;
@@ -443,20 +452,12 @@ display: -ms-flexbox;
   fill: white;
   width: 50px;
   height: 50px;
-  position: absolute;
-    height: 50px;
-    left: 0%;
-    bottom: 0%;
 }
 
 .songBoxUpGreen{
   fill: #1ED760;
   width: 50px;
   height: 50px;
-  position: absolute;
-    height: 50px;
-    left: 0%;
-    bottom: 0%;
 }
 
 .songBoxDown{
@@ -485,15 +486,18 @@ display: -ms-flexbox;
 }
 
 .time{
-  text-align: left;
+  font-size: 12px;
+    position: absolute;
+    right: 8px;
+    top: 25px;
 }
 
 .notadded{
-  position: absolute;
-  height: 35px;
-  width: 35px;
-  top: 0%;
-  right: 0;
+ position: absolute;
+    height: 33px;
+    width: 33px;
+    top: -3px;
+    right: 0;
 }
 
 .searchTitle{
@@ -718,7 +722,7 @@ input:focus:-ms-input-placeholder { color:transparent; }
     margin: -10px 0 -10px 0;
 }
 
-button{
+.cbutton1{
   position: relative;
   overflow: hidden;
   border: none;
@@ -728,7 +732,7 @@ button{
   width: 50px;
 }
 
-button:after {
+.cbutton1:after {
   content: '';
   position: absolute;
   top: 50%;
@@ -760,6 +764,172 @@ button:focus{
    outline:0;
 
 }
+
+
+
+button:focus:not(:active)::before {
+  animation: anim-effect-ivana-1 0.5s ease-out;
+}
+
 button:focus:not(:active)::after {
-  animation: ripple 0.7s ease-out;
+  animation: anim-effect-ivana-2 0.5s ease-out;
+}
+
+
+/* -webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+-webkit-tap-highlight-color:  rgba(255, 255, 255, 0); 
+
+ */
+
+.cbutton {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #286aab;
+  font-size: 1.4em;
+  transition: color 0.7s;
+}
+
+.cbutton.cbutton--click,
+.cbutton:focus {
+  outline: none;
+  color: #3c8ddc;
+}
+
+.cbutton__icon {
+  display: block;
+}
+
+.cbutton__text {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cbutton::after {
+  content: '';
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  margin: -35px 0 0 -35px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cbutton--effect-ivana::before {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  margin: -35px 0 0 -35px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cbutton--effect-ivana::before,
+.cbutton--effect-ivana::after {
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.7);
+}
+
+.cbutton--effect-ivana.cbutton--click::before {
+  -webkit-animation: anim-effect-ivana-1 0.5s forwards;
+  animation: anim-effect-ivana-1 0.5s forwards;
+}
+
+.cbutton--effect-ivana.cbutton--click::after {
+  -webkit-animation: anim-effect-ivana-2 0.5s forwards;
+  animation: anim-effect-ivana-2 0.5s forwards;
+}
+
+.cbutton--effect-ivana1::before {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  margin: -35px 0 0 -35px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cbutton--effect-ivana1::before,
+.cbutton--effect-ivana1::after {
+  box-shadow: 0 0 0 4px rgba(30,215,96, 0.7);
+}
+
+.cbutton--effect-ivana1.cbutton--click::before {
+  -webkit-animation: anim-effect-ivana-1 0.5s forwards;
+  animation: anim-effect-ivana-1 0.5s forwards;
+}
+
+.cbutton--effect-ivana1.cbutton--click::after {
+  -webkit-animation: anim-effect-ivana-2 0.5s forwards;
+  animation: anim-effect-ivana-2 0.5s forwards;
+}
+
+@-webkit-keyframes anim-effect-ivana-1 {
+  0% {
+    opacity: 1;
+    -webkit-transform: scale3d(0.5, 0.5, 1);
+    transform: scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: scale3d(1.1, 1.1, 1);
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes anim-effect-ivana-1 {
+  0% {
+    opacity: 1;
+    -webkit-transform: scale3d(0.5, 0.5, 1);
+    transform: scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: scale3d(1.1, 1.1, 1);
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@-webkit-keyframes anim-effect-ivana-2 {
+  0% {
+    opacity: 1;
+    -webkit-transform: scale3d(0.5, 0.5, 1);
+    transform: scale3d(0.5, 0.5, 1);
+  }
+  50%, 100% {
+    opacity: 0;
+    -webkit-transform: scale3d(1.2, 1.2, 1);
+    transform: scale3d(1.2, 1.2, 1);
+  }
+}
+
+@keyframes anim-effect-ivana-2 {
+  0% {
+    opacity: 1;
+    -webkit-transform: scale3d(0.5, 0.5, 1);
+    transform: scale3d(0.5, 0.5, 1);
+  }
+  50%, 100% {
+    opacity: 0;
+    -webkit-transform: scale3d(1.2, 1.2, 1);
+    transform: scale3d(1.2, 1.2, 1);
+  }
 }

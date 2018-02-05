@@ -18,14 +18,20 @@ export default class Controls extends React.Component  {
   //   //else 
   // }
 
-  render() {
+  shouldComponentUpdate(nextProps){
+    const playingChanged = this.props.isPlaying !== nextProps.isPlaying;
+    const deviceChanged = this.props.device !== nextProps.device;
+    const songChanged = this.props.background !== nextProps.background;
+    return playingChanged || deviceChanged || songChanged
+  }
 
+  render() {
     return (
-      <div className="controls" style={{
-          backgroundImage:`linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0), rgba(0,0,0,0.7)), url(${this.props.background})`
-      }}>
+      <div className="controls">
         <Previous />
-        {this.props.isPlaying ? <Pause pauseFunction={this.props.pause}/> : <Play playFunction={this.props.play}/>}
+        <button className="cbutton cbutton--effect-ivana" >
+          {this.props.isPlaying ? <Pause pauseFunction={this.props.pause}/> : <Play device = {this.props.device} playFunction={this.props.play}/>}
+        </button>
         <SkipComp playFunction={this.props.play}/>
       </div>
     );

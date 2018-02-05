@@ -11,29 +11,22 @@ import {
   resume,
 } from '../actions/actions'
 
-class Votingroom extends Component  {
-
+class Votingroom extends Component{
     pauseSong(){
       this.props.pause()
     }
-
-    // play(){
-    //   this.props.play()
-    // }
 
     nextSong(context){
       if(context === 'skip'){
         nextSong()
       }
       else{
-        // console.log('resumed')
         this.props.resume()
       }
     }
 
-
   render() {
-    // console.log(this.props)
+    // console.log(this.props.device)
     if(this.props.Votingroom.loading){
       return <h1>
         Loading
@@ -43,8 +36,8 @@ class Votingroom extends Component  {
     return (
       <div>
         <div className="currentlyPlaying">
-          <Header devicesClicked={this.props.devicesClicked} device ={this.props.device} roomName={this.props.room.roomName}/> 
-          <FirstSong isPlaying ={this.props.isPlaying} play={this.nextSong.bind(this)} pause={this.pauseSong.bind(this)} background={this.props.Votingroom.picture} timebox={this.props.Votingroom.time} artist ={this.props.Votingroom.artist} title={this.props.Votingroom.name} roomType={this.props.room.roomType}/>
+          <Header devicesClicked={this.props.devicesClicked} device = {this.props.device} roomName={this.props.room.roomName}/> 
+          <FirstSong isPlaying ={this.props.isPlaying} device = {this.props.device} play={this.nextSong.bind(this)} pause={this.pauseSong.bind(this)} background={this.props.Votingroom.picture} timebox={this.props.Votingroom.time} artist ={this.props.Votingroom.artist} title={this.props.Votingroom.name} roomType={this.props.room.roomType}/>
         </div>
         <div style={{display: 'flex',
                     justifyContent: 'center',
@@ -77,12 +70,10 @@ function mapDispatchToProps(dispatch) {
       pause(){
         return dispatch(pause())
       },
-
-    getMyInfo(){
-      return dispatch(getMyInfo())
-    }
+      getMyInfo(){
+        return dispatch(getMyInfo())
+      }
   }
-
 }
 
 

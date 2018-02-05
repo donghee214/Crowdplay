@@ -32,13 +32,11 @@ class Landing extends Component {
       }
     }
 
-  /** When we mount, get the tokens from react-router and initiate loading the info */
   componentDidMount() {
     const {dispatch, params} = this.props;
     const {accessToken, refreshToken} = params;
     dispatch(setTokens({accessToken, refreshToken}));
     dispatch(getMyInfo())
-    // dispatch(getDevices())
 
   }
   toggleDropDown(){
@@ -108,6 +106,7 @@ class Landing extends Component {
         createClicked: this.createClicked.bind(this),
         joinClicked: this.joinClicked.bind(this)
     }
+    
     return (
       <div>
         {this.state.errorMsg}

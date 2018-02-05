@@ -22,6 +22,7 @@ export default class Devices extends React.Component  {
 
 	refreshView(){
 		getDevices().then((devices) => {
+			console.log(devices)
 			this.setState({devices: devices})
 		})
 	}
@@ -32,7 +33,10 @@ export default class Devices extends React.Component  {
 
 	changeDevice(device){
 		this.props.changeDevice(device).then(() => {
-			this.refreshView()
+			setTimeout(() => {
+				this.refreshView()
+			},500)
+			
 		})
 	}
 

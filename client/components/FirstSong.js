@@ -9,12 +9,17 @@ export default class Firstsong extends React.Component   {
   shouldComponentUpdate(nextProps){
     const songChange = this.props.title !== nextProps.title;
     const pauseChange = this.props.isPlaying !== nextProps.isPlaying;
-    return songChange || pauseChange
+    const deviceChange = this.props.device !== nextProps.device;
+    return songChange || pauseChange || deviceChange
   }
+  
   render() {
+
     return (
-      <div>
-        {this.props.roomType ? <Controls pause={this.props.pause} play={this.props.play} isPlaying={this.props.isPlaying} firstSong={this.props.firstSong} background ={this.props.background}/> : null}
+      <div className="firstsongContainer"  style={{
+          backgroundImage:`linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0), rgba(0,0,0,0.7)), url(${this.props.background})`
+      }}>
+        {this.props.roomType ? <Controls device = {this.props.device} pause={this.props.pause} play={this.props.play} isPlaying={this.props.isPlaying} firstSong={this.props.firstSong}/> : null}
         <div className="bottomContent" style= {{height:'20%'}}>
           <h1 className="songTitle">
             {this.props.title}

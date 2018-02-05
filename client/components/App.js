@@ -10,9 +10,7 @@ export default class SpotifyLogin extends Component {
     const {children} = this.props;
     return (
       <div className="spotify-login">
-     
           {children}
-
       </div>
     );
   }

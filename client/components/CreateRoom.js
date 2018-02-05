@@ -28,7 +28,6 @@ export default class Createroom extends React.Component  {
       <div className="createContainer">
         <Create style="createRoom"/>
         <InputBox func ={this.props.create} removeError={this.props.removeError}/>
-        
       </div>
     );
   }
