@@ -12,6 +12,16 @@ export default class Firstsong extends React.Component   {
     const deviceChange = this.props.device !== nextProps.device;
     return songChange || pauseChange || deviceChange
   }
+
+  returnTime(){
+    let seconds = this.props.timebox/1000;
+    let minutes = Math.floor(seconds/60);
+    seconds = Math.floor(seconds % 60);
+    if(seconds < 10){
+      seconds = '0'+seconds
+    }
+    return <h3 className="timeBox">{minutes}:{seconds}</h3>
+  }
   
   render() {
 
@@ -28,7 +38,7 @@ export default class Firstsong extends React.Component   {
             {this.props.artist}
           </h2>
           <h3 className="timeBox">
-            {this.props.timebox}
+            {this.returnTime()}
           </h3>
         </div>
       </div>

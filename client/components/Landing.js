@@ -40,30 +40,29 @@ class Landing extends Component {
 
   }
   toggleDropDown(){
-    this.setState({mainPage: !this.state.mainPage})
+    this.setState({mainPage: !this.state.mainPage, errorMsg: null})
   }
 
   createClicked(){
-    this.setState({whatToRenderDropdown: <CreateRoom removeError={this.removeError.bind(this)} errorMsg={this.state.errorMsg} create={this.create.bind(this)}/>})
+    this.setState({whatToRenderDropdown: <CreateRoom id={"Create"} create={this.create.bind(this)}/>})
   }
 
   joinClicked(){
-    this.setState({whatToRenderDropdown: <JoinRoom removeError={this.removeError.bind(this)} errorMsg={this.state.errorMsg} join={this.join.bind(this)}/>})
+    this.setState({whatToRenderDropdown: <JoinRoom id={"Join"} join={this.join.bind(this)}/>})
   }
 
   create(roomName){
     const {dispatch} = this.props
     dispatch(createDB(roomName)).then((result) => {
       if(result){
-          this.setState({errorMsg:null, votingRoom: true})
+          this.setState({votingRoom: true})
           this.toggleDropDown()
       }
       else{
         this.setState({errorMsg: <h1 className="errorMessage">Roomname is in use<span className="period">.</span></h1>})
-        // console.log(this.state.errorMsgStyle, 'WTFF')
-        // setTimeout(() => {
-        //   this.setState({errorMsgStyle: 0})
-        // }, 1000)
+        setTimeout(() => {
+          this.setState({errorMsg: null})
+        }, 1000)
       }
     }) 
   }
@@ -72,18 +71,18 @@ class Landing extends Component {
     const {dispatch} = this.props
     dispatch(joinDB(roomName)).then((result) => {
       if(result){
-          this.setState({errorMsg:null, votingRoom: true})
+          this.setState({votingRoom: true})
           this.toggleDropDown()
       }
       else{
         this.setState({errorMsg: <h1 className="errorMessage">Room does not exist</h1>})
+        setTimeout(() => {
+          this.setState({errorMsg: null})
+        }, 1000)
       }
     })
   }
 
-  removeError(){
-    this.setState({errorMsg:null})
-  }
 
   searchClicked(){
     this.setState({whatToRenderDropdown: <Search />})

@@ -36,7 +36,6 @@ export function setTokens({accessToken, refreshToken}) {
 
 const refresh = function(){
      spotifyApi.getMyCurrentPlayingTrack().then(function(data){
-      console.log("CALLED")
       if(data.item.duration_ms - data.progress_ms < 5500){
         setTimeout(function(){
          nextSong()
@@ -170,6 +169,9 @@ let activeDevice = null
 
 export function watchChildRemoved(dispatch) {
   database.ref(roomId+'/songs/').on('child_removed', (snapshot) => {
+    database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
+      return numOfSongs = numOfSongs - 1
+    })
     for(let i = 0; i < songList.length; i++){
       if(songList[i].songId === snapshot.val().songId){
         songList.splice(i, 1)
@@ -181,16 +183,6 @@ export function watchChildRemoved(dispatch) {
 }
 
 
-
-
-// export function watchChildRemovedJoin(dispatch) {
-//   database.ref(roomId+'/songs/').on('child_removed', (snapshot) => {
-//     console.log('CHILD REMOVED', updateArr)
-//     dispatch({ type: REMOVE_SONGS, data: updateArr});
-//     dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
-//   });
-// }
-
 function sort(arr){
 
 }
@@ -199,34 +191,6 @@ export function skip(){
    nextSong()
 }
 
-
-// initial call, or just call refresh directly
-// setTimeout(refresh, 5000);
-// const config = {
-//   apiKey: "AIzaSyCWfDeoXue1YnVRZGXiy9q3M2A2-PknkbY",
-//   authDomain: "nextup-9685a.firebaseapp.com",
-//   databaseURL: "https://nextup-9685a.firebaseio.com",
-//   projectId: "nextup-9685a",
-//   storageBucket: "nextup-9685a.appspot.com",
-//   messagingSenderId: "11444832309"
-// };
-
-// firebase.initializeApp(config);
-// const database = database;
-
-
-
-
-
-    // database.ref('/').on('child_changed', function(snapshot){
-    //    console.log('CHANGED',snapshot.val())
- 
-    //    // dispatch({type: GETSONGS_END, data: 'blah'})
-    // })
-
-// database.ref('/').on('child_added', function(snapshot){
-//     console.log('ADDED',snapshot.val())
-//  })
 export function addSongsDone(){
   return dispatch =>{
     dispatch({ type: ADD_SONGS_DONE});
@@ -235,25 +199,21 @@ export function addSongsDone(){
 }
 
 export function watchGuestAddedEvent(dispatch) {
-
-//   var ref = db.ref("dinosaurs");
-//   ref.orderByChild("height").on("child_added", function(snapshot) {
-//   console.log(snapshot.key + " was " + snapshot.val().height + " meters tall");
-// });
   database.ref(roomId+'/songs').on('child_added', function(snapshot){
+    database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
+      return numOfSongs = numOfSongs + 1
+    })
     songList.push(snapshot.val())
     dispatch({ type: ADD_SONGS, data: songList});
-    // console.log('CHILD HAS BEEN ADDED', snapshot.val())
   });
+
 }
 
 
 
 export function voteListener(dispatch) {
   database.ref(roomId+'/songs/').on('child_changed', (snapshot) => {
-
     for(var i = 0; i < songList.length; i++){
-
       if(songList[i].songId === snapshot.val().songId){
         songList[i] = snapshot.val()
         dispatch({ type: UPDATE_VOTE, data: snapshot.val(), index: i});
@@ -269,10 +229,14 @@ export function createDB(roomName){
           return false
         }
         roomId = roomName;
+        database.ref(roomId).set({
+          numOfSongs:0,
+        })
         database.ref(roomId + '/people').set({
           host: userId
         })
-        console.log(spotifyApi)
+        
+        // console.log(spotifyApi)
         setDefaultDevice().then(() => {
           dispatch({type: DEVICES, data: activeDevice})
         })
@@ -289,10 +253,6 @@ export function getDevices(){
   })
 }
 
-const ret = function(){
-  console.log('done')
-  return true
-}
 
 export function changeDevice(device){
   return dispatch => {
@@ -357,17 +317,25 @@ export function joinDB(roomName){
 // }
 
 export function postSong(name, artist, time, picture, id, uri){
-    database.ref(roomId + '/songs/'+ id).set({
-      SongName:name,
-        artist:artist,
-        time:time,
-        picture:picture,
-        songId:id,
-        uri:uri,
-        upvote: 'Empty',
-        votecount: 1,
-        voters: {[userId]: true}
-     })
+    return database.ref(roomId + '/numOfSongs').once('value').then(snapshot => {
+      if(snapshot.val() < 15){
+        database.ref(roomId + '/songs/'+ id).set({
+          SongName:name,
+          artist:artist,
+          time:time,
+          picture:picture,
+          songId:id,
+          uri:uri,
+          upvote: 'Empty',
+          votecount: 1,
+          voters: {[userId]: true}
+        })
+      }
+      else{
+        return false
+      }
+    })
+
 }
 
 
@@ -466,20 +434,6 @@ export function order(){
 
 
 
-// function orderSongs(){
-//   let orderedlist = [];
-//     // dispatch({ type: SPOTIFY_SEARCH_LOADING});
-//     database.ref('/songs/').once('value').then(function(snapshot){
-//       orderedlist = Object.values(snapshot.val());
-//       orderedlist.sort(function(a,b) {
-//          return b.votecount - a.votecount;
-//       })
-     
-//     })
-//     return orderedlist
-// }
-
-
 export function increment(id, user_id3){
 
   var ref = database.ref(roomId+'/songs/' + id);
@@ -506,30 +460,7 @@ export function increment(id, user_id3){
   })
 }
 
-// export function createPlaylistContain(name){
-//   function getPlaylists(){
-//     spotifyApi.getUserPlaylists(userId, {limit:5}).then(function(data){
-//       database.ref('playlist/').set({
-//             playlistId: data.items[0].id,
-//             uri: data.items[0].uri,
-//             hostId: userId,
-//             playing: false
-//           })
-//       playlistId = data.items[0].id;
-//       playlistUri = data.items[0].uri
-//     })
-//   }
-//     function createPlaylist(){
-//       console.log('created')
-//       spotifyApi.createPlaylist(userId, {
-//       "name": name,
-//       "description": "osafndsf",
-//       "collaborative": true,
-//       "public": false
-//     }).then(() => getPlaylists())
-//   }
-//   createPlaylist()
-// }
+
 /* get the user's info from the /me api */
 export function getMyInfo() {
   return dispatch => {
@@ -550,125 +481,17 @@ export function remove(id){
   database.ref(roomId+'/songs/' + id).remove();
 }
 
-// export function addToPlaylist(id, dummy, uri){
-//   console.log(playlistId)
-//   spotifyApi.addTracksToPlaylist(userId, playlistId, uri)
-// }
 
-// export function getEndOfSong(){
-//   spotifyApi
-// }
-
-
-// export function getDevices() {
-
-//   // console.log('CALLED')
-//   spotifyApi.getMyDevices().then(function(data) {
-//     devices = data
-//     // console.log('win')
-//     console.log(data)
-//     // spotifyApi.pause(data)
-//   })
-//   .catch(e => {
-//     dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
-//   });
-// }
-
-
-// export function getDevices() {
-//   return dispatch => {
-//     dispatch({ type: SPOTIFY_ME_BEGIN});
-//     spotifyApi.getMyDevices().then(function(data) {
-//       devices = data
-//       console.log(data)
-//       // spotifyApi.pause(data)
-//     })
-//     .catch(e => {
-//       dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
-//     });
-
-//   };
-
-// }
-
-// export function createPlaylist(){
-//   return dispatch => {
-//     dispatch({ type: SPOTIFY_ME_BEGIN});
-//     spotifyApi.createPlaylist(id, {
-//         "name": "testList2",
-//         "description": "osafndsf",
-//         "collaborative": true,
-//         "public": true
-//       })
-//     .catch(e => {
-//       dispatch({ type: SPOTIFY_ME_FAILURE, error: e });
-//     });
-
-//   };
-// }
-
-
-
-// export function pause(){
-//   cosnole.log('hello')
-//   console.log(devices)
-//   spotifyApi.pause(devices)
-// }
 
 export function getCurrent(){
 
-  // spotifyApi.getMyCurrentPlaybackState().then(function(data){
-  //   console.log(data)
-  // })
   let details;
   return spotifyApi.getMyCurrentPlayingTrack().then(function(data){
       return [data.item, data.context.uri]
     })
-    // console.log(details)
-    // return details
-
 }
 
 
     
-
-
-// helper.player.on('ready', () => {
-//   helper.player.on('end', () => { console.log('END')});
-
-
-// });
-
-
-
-
-
-
-// export function play(){
-//   spotifyApi.play()
-// }
-
-// export function skip(){
-//   spotifyApi.skipToNext(devices)
-// }
-
-
-
-// export function reorder(arr){
-//   // spotifyApi.getPlaylistTracks(userId, playlistId).then(function(data){
-//   //   console.log(data)
-//   // })
-//   // spotifyApi.reorderTracksInPlaylist(userId)
-//   console.log(userId, playlistId, arr)
-//   spotifyApi.replaceTracksInPlaylist(userId, playlistId, arr)
-// }
-// export function pause() {
-
-//     spotifyApi.pause('fb677ab8ac3b1dd2f4aa34f6a70f3c9e4871f2b0')
-
-
-// }
-
-
 
 

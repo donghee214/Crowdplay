@@ -16,15 +16,21 @@ class SongSection extends Component  {
       this.state = {
         isPlaying: false,
         grid: {
-        '0':[50,0],
-        '1':[0,50],
-        '2':[50,50],
-        '3':[0,100],
-        '4':[50,100],
-        '5':[0,150],
-        '6':[50,150],
-        '7':[0,200],
-        '8':[50,200],
+                '0':[100,0],
+        '1':[0,100],
+        '2':[100,100],
+        '3':[0,200],
+        '4':[100,200],
+        '5':[0,300],
+        '6':[100,300],
+        '7':[0,400],
+        '8':[100,400],
+        '9':[0,500],
+        '10':[100,500],
+        '11':[0,600],
+        '12':[100,600],
+        '13':[0,700],
+        '14':[100,700],
         }
       }
     }
@@ -36,7 +42,7 @@ class SongSection extends Component  {
   render() {    
     // console.log('SONG SECTION RERENDER')
     return (
-        <div className="upNext" style={{height:'50vw'}}>
+        <div className="upNext">
             <Add searchClicked={this.props.searchClicked} style="addContainerSong"/>}
             {this.props.songSection.list.map((info, index) =>
                 <Song userId={this.props.songSection.user} key={this.props.songSection.list[index].songId} votes={this.props.songSection.list[index].votecount}info = {info} position={this.state.grid[index]}/>

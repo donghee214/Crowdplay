@@ -17,6 +17,9 @@ export default class Song extends React.Component{
     let seconds = this.props.info.time/1000;
     let minutes = Math.floor(seconds/60);
     seconds = Math.floor(seconds % 60);
+    if(seconds < 10){
+      seconds = '0'+seconds
+    }
     return <h3 className="timeBox">{minutes}:{seconds}</h3>
   }
 
@@ -38,8 +41,8 @@ export default class Song extends React.Component{
                   backgroundPosition:'center',
                   backgroundSize:'contain',
                   left:0,
-                  WebkitTransform: `translate3d(${this.props.position[0]}vw, ${this.props.position[1]}vw, 0)`,
-                  transform: `translate3d(${this.props.position[0]}vw, ${this.props.position[1]}vw, 0)`,
+                  WebkitTransform: `translate3d(${this.props.position[0]}%, ${this.props.position[1]}%, 0)`,
+                  transform: `translate3d(${this.props.position[0]}%, ${this.props.position[1]}%, 0)`,
                 }}>
                 <div className="votes">
                   

@@ -36,7 +36,7 @@ class Votingroom extends Component{
     return (
       <div>
         <div className="currentlyPlaying">
-          <Header devicesClicked={this.props.devicesClicked} device = {this.props.device} roomName={this.props.room.roomName}/> 
+          <Header roomType={this.props.room.roomType} devicesClicked={this.props.devicesClicked} device = {this.props.device} roomName={this.props.room.roomName}/> 
           <FirstSong isPlaying ={this.props.isPlaying} device = {this.props.device} play={this.nextSong.bind(this)} pause={this.pauseSong.bind(this)} background={this.props.Votingroom.picture} timebox={this.props.Votingroom.time} artist ={this.props.Votingroom.artist} title={this.props.Votingroom.name} roomType={this.props.room.roomType}/>
         </div>
         <div style={{display: 'flex',

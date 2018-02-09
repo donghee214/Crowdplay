@@ -12,7 +12,12 @@ export default class Songresult extends React.Component  {
 
   addSong(){
     this.setState({added:true})
-    this.props.postSong(this.props.info.name, this.props.info.artists, this.props.info.duration_ms, this.props.info.album.images[0].url, this.props.info.id, this.props.info.uri)
+    this.props.postSong(this.props.info.name, this.props.info.artists, this.props.info.duration_ms, this.props.info.album.images[0].url, this.props.info.id, this.props.info.uri).then((res) => {
+      if(res === false){
+        alert('too many songs')
+        this.setState({added:false})
+      }
+    })
   }
 
   removeSong(){

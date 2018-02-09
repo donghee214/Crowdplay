@@ -40,7 +40,7 @@ export default class InputSearch extends React.Component  {
   render() {
 
     return (
-      <div>
+      <div style={{width:'100%'}}>
         <form onSubmit={(e) => this.clickHandle(e)}>
             <input className="inputRoom searchSong" placeholder = "Search" type="text" value={this.state.inputValue} onChange={this.updateInputValue.bind(this)}/>
         </form>

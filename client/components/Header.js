@@ -19,7 +19,7 @@ export default class Header extends React.Component  {
   render() {
     return (
       <div className="header">
-      	<Setting devicesClicked={this.props.devicesClicked} device={this.props.device}/>
+      	{this.props.roomType ? <Setting devicesClicked={this.props.devicesClicked} device={this.props.device}/>:null}
         <div className="titleContainer">
 	        <h3>
 	        	Room Name:

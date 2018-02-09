@@ -26,6 +26,12 @@ h3{
   margin: 0;
   font-family: 'Montserrat', sans-serif;
 }
+@media only screen and (min-width:1025px) {
+  h3{
+    font-size: 15px;
+    
+  }
+}
 body{
   top: 0px;
   position: absolute;
@@ -68,6 +74,13 @@ body{
     box-sizing: border-box;
 }
 
+@media only screen and (min-width:1025px) {
+  .devicesList{
+    padding: 0 2vw 0 2vw;
+  }
+}
+
+
 
 .visible{
   opacity: 1;
@@ -92,8 +105,15 @@ body{
 .refresh{
   width: 100px;
   height: 100px;
-  margin-top: 15vh;
+  margin-top: 0;
 }
+
+@media only screen and (min-width:1025px) {
+  .refresh{
+    cursor: pointer;
+  }
+}
+
 .setting{
   fill: #FFFFFF;
    width: 35px;
@@ -109,6 +129,7 @@ body{
     max-width: 100%;
 }
 
+
 .noDevice{
     font-size: 10px;
    overflow: hidden;
@@ -119,9 +140,15 @@ body{
     color: #FFF;
 }
 
+@media only screen and (min-width:1025px) {
+  .noDevice{
+    cursor: pointer;
+  }
+}
+
 .settingContain{
       position: absolute;
-    left: 4%;
+    left: 3%;
     top: 10%;
     width: 55px;
     height: 55px;
@@ -144,13 +171,30 @@ body{
   left: 0;
 
 }
+@media only screen and (min-width:1025px) {
+  .upNext{
+    width:35%;
+    top:0;
+    left:65%;
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+}
 
 .songBox{
-  width: 50vw;
-  height: 50vw;
+  width: 50%;
+  padding-top: 50%;
   position: absolute;
-    background-position: center !important;
-    background-size: contain !important;
+  background-position: center !important;
+   background-size: contain !important;
+}
+
+@media only screen and (min-width:1025px) {
+  .songBox{
+    width: 50%;
+    padding-top: 50%;
+  }
 }
 
 .deviceOptionBox{
@@ -181,10 +225,31 @@ body{
   fill: white;
 }
 
+@media only screen and (min-width:1025px) {
+  .controlButton{
+    width:35px;
+    height:35px;
+    cursor: pointer;
+  }
+  .controlContainer{
+    margin-bottom: 20px;
+  }
+}
+
+
 .controlButtonLarge{
   height: 60px;
   width: 60px;
   fill: white;
+}
+
+@media only screen and (min-width:1025px) {
+  .controlButtonLarge{
+    width:70px;
+    height:70px;
+    cursor: pointer;
+    
+  }
 }
 
 .instru{
@@ -196,9 +261,17 @@ body{
   font-weight: 300;
 }
 
+@media only screen and (min-width:1025px) {
+  .instru{
+        width: 100%;
+    padding: 0 2vw 0 2vw;
+  }
+}
+
+
 .shareContain{
     position: absolute;
-  right: 5%;
+  right: 3%;
   top: 10%;
     display: flex;
   justify-content: center;
@@ -233,9 +306,23 @@ body{
   margin-bottom: 1%;
 }
 
+@media only screen and (min-width:1025px) {
+  .title{
+    margin-top: 5%;
+    font-size: 70px;
+  }
+}
+
 .subtitle{
   margin-top: 0;
   color: #C2C2C2;
+}
+
+@media only screen and (min-width:1025px) {
+  .subtitle{
+   font-size:40px;
+    
+  }
 }
 
 
@@ -254,6 +341,16 @@ body{
     background-size: contain !important;
 
 }
+
+@media only screen and (min-width:1025px) {
+  .controls{
+    width:100%;
+    height:80%;
+    bottom: 20%; 
+    align-items: flex-end; 
+
+  }
+}
 .options{
   display: flex;
   justify-content: space-evenly;
@@ -261,9 +358,22 @@ body{
   margin-top: 50%;
 }
 
+@media only screen and (min-width:1025px) {
+  .options{
+   margin-top:7%;
+  }
+}
+
 .logo{
   width: 58px;
   height: 58px;
+}
+
+@media only screen and (min-width:1025px) {
+  .logo{
+    width:90px;
+    height:90px;
+  }
 }
 
 .option{
@@ -278,9 +388,23 @@ body{
   background-color: transparent;
 }
 
+@media only screen and (min-width:1025px) {
+  .option{
+    width:20vw;
+    height:20vw;
+    cursor:pointer;
+  }
+}
+
 .period{
   color: #1ED760;
   font-size: 41px;
+}
+
+@media only screen and (min-width:1025px) {
+  .period{
+  font-size:41px;
+  }
 }
 
 .period1{
@@ -305,6 +429,12 @@ a{
   color: #1ED760;
   font-size: 5.2vmax;
 }
+
+@media only screen and (min-width:1025px) {
+  .periodSmaller{
+  font-size:30px;
+  }
+}
 /* .backContainer{
   color: #FF3366;
 } */
@@ -320,12 +450,25 @@ a{
   -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
 -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
 box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
+overflow: hidden;
+}
+
+@media only screen and (min-width:1025px) {
+  .backdrop{
+    width:35%;
+    left:65%;
+  }
 }
 
 .up{
   height: 40px;
   width: 40px;
   margin-top: 4px;
+}
+@media only screen and (min-width:1025px) {
+  .up{
+cursor: pointer;
+  }
 }
 
 .upToggleContainer{
@@ -359,6 +502,12 @@ box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
     margin-top: 0;
 }
 
+@media only screen and (min-width:1025px) {
+  .up{
+cursor: pointer;
+  }
+}
+
 .searchSong{
   text-align: left !important;
   font-weight: 600;
@@ -367,8 +516,25 @@ box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
   padding: 3px 0 2px 0px !important;
 }
 
+@media only screen and (min-width:1025px) {
+  .searchSong{
+    width:100%;
+    text-align: left;
+  }
+}
+
 .searchHelp{
   font-size: 15px;
+
+}
+
+@media only screen and (min-width:1025px) {
+  .searchHelp{
+    font-size:15px;
+      text-align: left;
+    font-weight: 400;
+    
+  }
 }
 
 .results{
@@ -377,13 +543,32 @@ box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
   padding: 0 9vw 0 9vw;
   height: calc(~'100% - 110px');
   overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+}
+
+@media only screen and (min-width:1025px) {
+  .results{
+    height: calc(~'100% - 120px');
+    padding: 0 2vw 0 2vw;
+    width: 100%;
+
+  }
 }
 
 .songResult{
   width: 100%;
   height: 60px;
   position: relative;
+  margin-bottom: 17.5px;
 
+}
+
+@media only screen and (min-width:1025px) {
+  .songResult{
+    cursor: pointer;
+    margin: 0 0 20px 0;
+  }
 }
 
 
@@ -395,6 +580,12 @@ box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
   margin: 0 10px 0 0px;
   font-weight: 300;
     font-family: 'Montserrat', sans-serif;
+}
+
+@media only screen and (min-width:1025px) {
+  .artistList{
+    font-size:16px;
+  }
 }
 
 .artistContain{
@@ -428,18 +619,25 @@ box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
   text-overflow: ellipsis; 
   white-space: nowrap;
   font-weight: 300;
-  color: #D4D4D4;
+  color: #efefef;
   margin:  0;
-  margin-top: -2px;
+  margin-top: 0px;
+}
+
+@media only screen and (min-width:1025px) {
+  .artistTitle{
+    font-size:16px;
+  }
 }
 
 .votes{
-display: -ms-flexbox;
+    display: -ms-flexbox;
     display: flex;
     -ms-flex-direction: column;
     flex-direction: column;
     height: 70%;
-    position: relative;
+    position: absolute;
+    width: 100%;
     top: .5%;
     -ms-flex-pack: start;
     justify-content: flex-start;
@@ -454,10 +652,22 @@ display: -ms-flexbox;
   height: 50px;
 }
 
+@media only screen and (min-width:1025px) {
+  .songBoxUp{
+    cursor: pointer;
+  }
+}
+
 .songBoxUpGreen{
   fill: #1ED760;
   width: 50px;
   height: 50px;
+}
+
+@media only screen and (min-width:1025px) {
+  .songBoxUpGreen{
+    cursor: pointer;
+  }
 }
 
 .songBoxDown{
@@ -471,18 +681,31 @@ display: -ms-flexbox;
 }
 
 .songTitle{
-    font-size: 22.5px;
+    font-size: 20px;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin: 0;
+        margin: 0 0 -1px 0;
     width: 85%;
     overflow: hidden;
     text-align: center;
 }
 
+@media only screen and (min-width:1025px) {
+  .songTitle{
+    font-size: 22.5px;
+    
+  }
+}
+
 .timeBox{
-  font-size: 10.5px;
+  font-size: 12.5px;
    margin:  0;
+}
+
+@media only screen and (min-width:1025px) {
+  .timebox{
+    font-size: 16px;
+  }
 }
 
 .time{
@@ -491,6 +714,13 @@ display: -ms-flexbox;
     right: 8px;
     top: 25px;
 }
+
+@media only screen and (min-width:1025px) {
+  .time{
+font-size: 14px;
+  }
+}
+
 
 .notadded{
  position: absolute;
@@ -510,6 +740,13 @@ display: -ms-flexbox;
   margin-bottom: -3px;
 }
 
+@media only screen and (min-width:1025px) {
+  .searchTitle{
+      font-size:20px;
+  }
+}
+
+
 .topContent{
   height: 80px;
   width: 100%;
@@ -523,8 +760,17 @@ display: -ms-flexbox;
   /* margin-top: 10px; */
   align-items: flex-start;
   padding: 20px 9vw 25px 9vw;
+
   /* margin-bottom: 18vw; */
 
+}
+
+@media only screen and (min-width:1025px) {
+  .topContent{
+    padding-left: 20px;
+    height:100px;
+    padding: 20px 2vw 25px 2vw;
+  }
 }
 
 input[type=text] {
@@ -536,6 +782,12 @@ input[type=text] {
     font-size: 25px;
     text-align: center;
     padding: 3px 0 7px 0px;
+}
+
+@media only screen and (min-width:1025px) {
+  input[type=text]{
+    text-align:center;
+  }
 }
 
 input:focus{
@@ -570,6 +822,12 @@ input:focus:-ms-input-placeholder { color:transparent; }
   justify-content: start;
   align-items: center;
   flex-direction: column;
+}
+
+@media only screen and (min-width:1025px) {
+  .createContainer{
+    top:5%;
+  }
 }
 
 .logoContainer{
@@ -633,6 +891,13 @@ input:focus:-ms-input-placeholder { color:transparent; }
     /* padding: 5px; */
 }
 
+@media only screen and (min-width:1025px) {
+  .dropButton{
+    cursor: pointer;
+  }
+}
+
+
 .header{
   height: 65px;
   background: -moz-linear-gradient(top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
@@ -654,6 +919,13 @@ input:focus:-ms-input-placeholder { color:transparent; }
     background-color: grey;
 }
 
+@media only screen and (min-width:1025px) {
+  .currentlyPlaying{
+    width:65%;
+    height:100%;
+  }
+}
+
 .addContainerSong{
   margin-top: 20%;
     display: -ms-flexbox;
@@ -666,17 +938,22 @@ input:focus:-ms-input-placeholder { color:transparent; }
     flex-direction: column;
     width: 50%;
     top: 0;
-    padding-top: 0%;
+    padding-top: 50%;
     margin-top: 0;
-    height: 50vw;
     margin: 0;
     position: absolute;
 
 }
 
+/* @media only screen and (min-width:1025px) {
+  .addContainerSong{
+    width:50%;
+  }
+}
+ */
 .plus{
-  width: 70px;
-  height: 70px;
+  min-width: 60px;
+  min-height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -684,9 +961,25 @@ input:focus:-ms-input-placeholder { color:transparent; }
   border-radius: 50%;
 }
 
+@media only screen and (min-width:1025px) {
+  .plus{
+    cursor: pointer;
+    margin-top: 3vh;
+  }
+}
+
+
 .addDown{
   height: 30px;
   width: 30px;
+}
+
+@media only screen and (min-width:1025px) {
+  .addDown{
+    min-height: 25px;
+    min-width: 25px;
+    margin-top: -2px;
+  }
 }
 
 .addition{
@@ -696,10 +989,25 @@ input:focus:-ms-input-placeholder { color:transparent; }
   font-size: 45px;
 }
 
+@media only screen and (min-width:1025px) {
+  .addition{
+    font-size:40px;
+    
+  }
+}
+
 .addSub{
   margin-top: 12px;
   font-size: 20px;
   margin-bottom: 0px;
+}
+
+@media only screen and (min-width:1025px) {
+  .addSub{
+    margin-top: 6px;
+    font-size:20px;
+    
+  }
 }
 
 .addContainer{
@@ -708,6 +1016,16 @@ input:focus:-ms-input-placeholder { color:transparent; }
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.addContainerWeb{
+  position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: inherit;
+    justify-content: inherit;
+    align-items: inherit;
+    height: 100%;
 }
 
 .search{

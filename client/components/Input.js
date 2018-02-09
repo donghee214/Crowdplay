@@ -21,14 +21,12 @@ constructor(props){
   }
   renderSonglist(){
     this.props.func(this.state.inputValue)
-    this.props.removeError()
     // createPlaylistContain(this.state.inputValue);
   }
 
   search(evt){
     evt.preventDefault();
     this.props.func(this.state.inputValue)
-    this.props.removeError()
   }
 
   render() {
@@ -37,7 +35,7 @@ constructor(props){
      <form onSubmit={(e) => this.search(e)}>
           <input className="inputRoom" placeholder = "Create room name" type="text" value={this.state.inputValue} onChange={this.updateInputValue.bind(this)}/>
          </form>
-      <h1 onClick={this.renderSonglist.bind(this)} className="dropButton">Create<span className="period">.</span></h1>
+      <h1 onClick={this.renderSonglist.bind(this)} className="dropButton">{this.props.id}<span className="period">.</span></h1>
      </div>
     );
   }

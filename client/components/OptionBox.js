@@ -36,10 +36,11 @@ export default class Option extends React.Component  {
   /** Render the user's info */
   render() {
     return (
-      <div className="option" onClick={this.buttonClicked.bind(this)}>
+      <button className="option" onClick={this.buttonClicked.bind(this)}>
         {this.props.payload.image}
         <h1 className="fontSize">{this.props.payload.text}<span className="period">.</span></h1>
-      </div>
+  
+      </button>
     );
   }
 }

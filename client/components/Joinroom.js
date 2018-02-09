@@ -20,7 +20,7 @@ export default class Joinroom extends React.Component  {
     return (
       <div className="createContainer">
         <Join style="createRoom" />
-        <InputBox func ={this.props.join} removeError={this.props.removeError}/>
+        <InputBox id={this.props.id} func ={this.props.join}/>
       </div>
     );
   }
