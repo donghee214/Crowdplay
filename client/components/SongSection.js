@@ -16,7 +16,7 @@ class SongSection extends Component  {
       this.state = {
         isPlaying: false,
         grid: {
-                '0':[100,0],
+        '0':[100,0],
         '1':[0,100],
         '2':[100,100],
         '3':[0,200],
