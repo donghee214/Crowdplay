@@ -1,5 +1,5 @@
-import firebase from 'firebase';
-
+// import firebase from 'firebase';
+const firebase = require('firebase');
 const config = {
   apiKey: "AIzaSyCWfDeoXue1YnVRZGXiy9q3M2A2-PknkbY",
   authDomain: "nextup-9685a.firebaseapp.com",
@@ -12,4 +12,6 @@ const config = {
 firebase.initializeApp(config);
 const database = firebase.database();
 
-export default database;
+
+// export default database;
+module.exports = database;

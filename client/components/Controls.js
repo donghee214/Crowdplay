@@ -29,7 +29,7 @@ export default class Controls extends React.Component  {
     return (
       <div className="controls">
         <Previous />
-        <button className="cbutton cbutton--effect-ivana" >
+        <button className="playBut cbutton cbutton--effect-ivana" >
           {this.props.isPlaying ? <Pause pauseFunction={this.props.pause}/> : <Play device = {this.props.device} playFunction={this.props.play}/>}
         </button>
         <SkipComp playFunction={this.props.play}/>

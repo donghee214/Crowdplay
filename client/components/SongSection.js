@@ -45,7 +45,7 @@ class SongSection extends Component  {
         <div className="upNext">
             <Add searchClicked={this.props.searchClicked} style="addContainerSong"/>}
             {this.props.songSection.list.map((info, index) =>
-                <Song userId={this.props.songSection.user} key={this.props.songSection.list[index].songId} votes={this.props.songSection.list[index].votecount}info = {info} position={this.state.grid[index]}/>
+                <Song roomType ={this.props.roomType} userId={this.props.songSection.user} key={this.props.songSection.list[index].songId} votes={this.props.songSection.list[index].votecount}info = {info} position={this.state.grid[index]}/>
             )}
         </div>
     );
@@ -55,6 +55,7 @@ class SongSection extends Component  {
 function mapStateToProps(state) {
   return {
     songSection: state.songList,
+    roomType: state.room.roomType
   };
 }
 

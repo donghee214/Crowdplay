@@ -41,6 +41,9 @@ export default class Songresult extends React.Component  {
     let seconds = this.props.info.duration_ms/1000;
     let minutes = Math.floor(seconds/60);
     seconds = Math.floor(seconds % 60);
+    if(seconds < 10){
+      seconds = '0'+seconds
+    }
     return <h3 className="time">{minutes}:{seconds}</h3>
   }
   render() {

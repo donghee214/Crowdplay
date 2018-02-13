@@ -26,9 +26,15 @@ export default class Firstsong extends React.Component   {
   render() {
 
     return (
-      <div className="firstsongContainer"  style={{
-          backgroundImage:`linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0), rgba(0,0,0,0.7)), url(${this.props.background})`
-      }}>
+      <div className="firstsongContainer">
+        <div className="backgroundImg" style={{
+            backgroundImage:`linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0), rgba(0,0,0,0.85)), url(${this.props.background})`
+        }}>
+        </div>
+        <div className="backgroundImageMain" style={{
+            backgroundImage:`url(${this.props.background})`
+        }}>
+        </div>
         {this.props.roomType ? <Controls device = {this.props.device} pause={this.props.pause} play={this.props.play} isPlaying={this.props.isPlaying} firstSong={this.props.firstSong}/> : null}
         <div className="bottomContent" style= {{height:'20%'}}>
           <h1 className="songTitle">

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Down from './svgs/down.js';
 // import {
 //   getMyInfo,

@@ -26,7 +26,6 @@ class Votingroom extends Component{
     }
 
   render() {
-    // console.log(this.props.device)
     if(this.props.Votingroom.loading){
       return <h1>
         Loading

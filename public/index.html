@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Name of App</title>
+    <title>Jukebox</title>
     <meta name="viewport" content="width=device-width, user-scalable=no">
+    <link rel="icon" type="image/png" href="logo.ico" sizes="16x16">
   </head>
   <body onResize="onResize();">
     <div id="root"></div>
@@ -10,7 +11,7 @@
   </body>
 </html>
 <script type="text/javascript">    
-	const height  = document.documentElement.clientHeight - 1;       
+	const height  = document.documentElement.clientHeight;       
     function onResize(){
     	document.getElementsByTagName("body")[0].style.height = height+'px';
     }

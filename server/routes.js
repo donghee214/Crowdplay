@@ -4,12 +4,12 @@ const Spotify = require('spotify-web-api-node');
 const querystring = require('querystring');
 const express = require('express');
 const router = new express.Router();
-
 // configure the express server
 const CLIENT_ID = 'efb68c1445ae4ab783e0dcbed33c1f84';
 const CLIENT_SECRET = '61afff17688e42d48952fd18d524eb1e';
 const REDIRECT_URI = 'http://localhost:3000/callback';
 const STATE_KEY = 'spotify_auth_state';
+
 // your application requests authorization
 const scopes = ['user-read-private', 'user-read-email', 'user-read-playback-state', 'user-modify-playback-state','playlist-modify-private', 'playlist-modify-public', 'playlist-read-private', 'playlist-read-collaborative'];
 
@@ -20,6 +20,10 @@ const spotifyApi = new Spotify({
   clientSecret: CLIENT_SECRET,
   redirectUri: REDIRECT_URI
 });
+
+let redirectToRoom = false;
+let room;
+
 
 /** Generates a random string containing numbers and letters of N characters */
 const generateRandomString = N => (Math.random().toString(36)+Array(N).join('0')).slice(2, N+2);
@@ -34,6 +38,8 @@ router.get('/login', (_, res) => {
   res.cookie(STATE_KEY, state);
   res.redirect(spotifyApi.createAuthorizeURL(scopes, state));
 });
+
+
 
 /**
  * The /callback endpoint - hit after the user logs in to spotifyApi
@@ -62,12 +68,29 @@ router.get('/callback', (req, res) => {
       spotifyApi.getMe().then(({ body }) => {
         console.log(body);
       });
-
+      console.log(redirectToRoom)
       // we can also pass the token to the browser to make requests from there
+      if(redirectToRoom === true){
+        redirectToRoom = false
+        res.redirect(`/#/${room}/${access_token}/${refresh_token}`)
+      }
       res.redirect(`/#/user/${access_token}/${refresh_token}`);
     }).catch(err => {
       res.redirect('/#/error/invalid token');
     });
+  }
+});
+
+router.get('/:tagId', function(req, res) {
+  room = req.params.tagId
+  if(room == null || room == "null"){
+    return
+  }
+  if(room !== 'callback' || room !== 'login'){
+      redirectToRoom = true;
+      const state = generateRandomString(16);
+      res.cookie(STATE_KEY, state);
+      res.redirect(spotifyApi.createAuthorizeURL(scopes, state));
   }
 });
 

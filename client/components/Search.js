@@ -24,9 +24,6 @@ export default class Search extends React.Component  {
     return false;
   }
 
-
-
-
   render() {
     return (
       <div className="search">

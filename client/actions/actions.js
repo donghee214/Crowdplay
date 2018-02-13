@@ -1,24 +1,22 @@
 import Spotify from 'spotify-web-api-js';
 import database from '../database.js';
-import { dispatch } from 'redux';
-
 const spotifyApi = new Spotify();
+
+let roomId = null;
+let songList = [];
+let userId = null;
+let activeDevice = null;
+let deleted = false;
 
 // our constants
 export const SPOTIFY_TOKENS = 'SPOTIFY_TOKENS';
 export const SPOTIFY_ME_BEGIN = 'SPOTIFY_ME_BEGIN';
 export const SPOTIFY_ME_SUCCESS = 'SPOTIFY_ME_SUCCESS';
 export const SPOTIFY_ME_FAILURE = 'SPOTIFY_ME_FAILURE';
-export const SPOTIFY_SEARCH_LOADING = 'SPOTIFY_SEARCH_LOADING';
-export const SPOTIFY_SEARCH_DONE = 'SPOTIFY_SEARCH_DONE';
 export const GETSONGS_BEGIN = 'GETSONGS_BEGIN';
 export const GETSONGS_END = "GETSONGS_END";
 export const ADD_SONGS = "ADD_SONGS";
-export const ADD_SONGS_DONE = "ADD_SONGS_DONE";
-export const SONGS = 'SONGS';
 export const UPDATE_VOTE = "UPDATE_VOTE";
-export const TOGGLE_LOADSONGS = 'TOGGLE_LOADSONGS';
-export const PLAYBACK_PLAYING = 'PLAYBACK_PLAYING';
 export const REMOVE_SONGS = 'REMOVE_SONGS';
 export const CHANGE_CURRENTSONG = "CHANGE_CURRENTSONG";
 export const SET_ROOMNAME = "SET_ROOMNAME";
@@ -26,6 +24,8 @@ export const JOIN_ROOMNAME = "JOIN_ROOMNAME";
 export const TOGGLE_SONG = "TOGGLE_SONG";
 export const DEVICES = "DEVICES";
 
+
+// set the access tokens for the api
 export function setTokens({accessToken, refreshToken}) {
   if (accessToken) {
     spotifyApi.setAccessToken(accessToken);
@@ -33,7 +33,7 @@ export function setTokens({accessToken, refreshToken}) {
   return { type: SPOTIFY_TOKENS, accessToken, refreshToken };
 }
 
-
+// function that runs in the background to keep checking the timestamp on the song playing
 const refresh = function(){
      spotifyApi.getMyCurrentPlayingTrack().then(function(data){
       if(data.item.duration_ms - data.progress_ms < 5500){
@@ -47,12 +47,20 @@ const refresh = function(){
      })
 }
 
+export function deleteSong(songId){
+  console.log('delete started')
+  deleted = true
+  console.log(deleted)
+  database.ref(roomId + '/songs/' + songId).remove()
+  
+}
+
+// function to change to the next song
 export function nextSong(context){    
-      clearInterval(refresh)
+      clearTimeout(refresh)
       let orderedlist =[];
       database.ref(roomId+'/songs/').once('value').then(snapshot => {
-      let aux = snapshot.val()
-      // console.log(snapshot.val(), 'AHHHHHHHHH')
+      const aux = snapshot.val()
       if(aux){
           orderedlist = Object.values(aux);
           orderedlist.sort(function(a,b) {
@@ -64,10 +72,12 @@ export function nextSong(context){
             })
             setTimeout(refresh, 5000)
           }).catch(e => {
-            console.log('CAUGHT SOME ERROR')
-            console.log(e)
+            console.log('CAUGHT SOME ERROR', e)
         })
         database.ref(roomId+'/songs/' + orderedlist[0].songId).remove() 
+        database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
+          return numOfSongs = numOfSongs - 1
+        })
       }
       //show no song remaining
       else{
@@ -95,33 +105,22 @@ export function nextSong(context){
     
 }
 
-export function play(){
-  return dispatch => {
-    database.ref(roomId+'/isPlaying/').set({
-        isPlaying: true
-    })
-    dispatch({type: TOGGLE_SONG, data: true})
-   return nextSong()
-  }
-
-}
-
+//resume song if something is playing, else start the playlist
 export function resume(){
   return dispatch => {
     database.ref(roomId+'/currentlyPlaying/').once('value').then(snapshot => {
-      const res = snapshot.val()
-      if(res){
+      if(snapshot.val()){
         spotifyApi.play({})
-        dispatch({type: TOGGLE_SONG, data: true})
       }
       else{
         nextSong()
-        dispatch({type: TOGGLE_SONG, data: true})
       }
+      dispatch({type: TOGGLE_SONG, data: true})
     })
   } 
 }
 
+//search for a song and return the results
 export function search(query){
   let songs = {};
   database.ref(roomId+'/songs/').once('value').then(snapshot => {
@@ -139,18 +138,14 @@ export function search(query){
         return Object.assign({}, info, {
           added: false
         }) 
-        
-        
       })
       return ret
     }).catch(e => {
      
-    });
-   
-
-    
+    });  
 }
 
+//pause the song and set it to false
 export function pause(){
   return dispatch => {
     spotifyApi.pause({})
@@ -161,56 +156,43 @@ export function pause(){
   }
 }
 
-let updateArr = [];
-let roomId = null;
-let songList = [];
-let userId = null;
-let activeDevice = null
-
+//listener for when song is removed
 export function watchChildRemoved(dispatch) {
   database.ref(roomId+'/songs/').on('child_removed', (snapshot) => {
-    database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
-      return numOfSongs = numOfSongs - 1
-    })
+    console.log('remove detected')
     for(let i = 0; i < songList.length; i++){
       if(songList[i].songId === snapshot.val().songId){
         songList.splice(i, 1)
       }
     }
+    songList.sort(function(a, b){
+      return b.votecount-a.votecount
+    })
     dispatch({ type: REMOVE_SONGS, data: songList});
-    dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+    if(deleted){
+      deleted = false  
+    }
+    else{
+      dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+    }
   });
 }
 
-
-function sort(arr){
-
-}
-
+//skip the song 
 export function skip(){
    nextSong()
 }
 
-export function addSongsDone(){
-  return dispatch =>{
-    dispatch({ type: ADD_SONGS_DONE});
-  }
-  
-}
-
+// listener for when song is added 
 export function watchGuestAddedEvent(dispatch) {
   database.ref(roomId+'/songs').on('child_added', function(snapshot){
-    database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
-      return numOfSongs = numOfSongs + 1
-    })
     songList.push(snapshot.val())
     dispatch({ type: ADD_SONGS, data: songList});
   });
-
 }
 
 
-
+// listener for when vote changed
 export function voteListener(dispatch) {
   database.ref(roomId+'/songs/').on('child_changed', (snapshot) => {
     for(var i = 0; i < songList.length; i++){
@@ -222,6 +204,7 @@ export function voteListener(dispatch) {
   });
 }
 
+// function when room is created
 export function createDB(roomName){
   return dispatch => {
     return database.ref('/').once('value').then(snapshot => {
@@ -246,14 +229,14 @@ export function createDB(roomName){
   }
 }
 
+// get the available devices to be connected to
 export function getDevices(){
   return spotifyApi.getMyDevices().then((devices) => {
-    // console.log(devices)
     return devices.devices
   })
 }
 
-
+// switch the current device to this 
 export function changeDevice(device){
   return dispatch => {
     return spotifyApi.transferMyPlayback([device.id]).then(() => {
@@ -264,6 +247,7 @@ export function changeDevice(device){
   }
 }
 
+// set the active device to the first one in the list
 function setDefaultDevice(){
     return spotifyApi.getMyDevices().then(function(devices){
       if(devices){
@@ -282,6 +266,7 @@ function setDefaultDevice(){
 
 }
 
+// run this function for someone joining a room
 export function joinDB(roomName){
   return dispatch => {
     return database.ref('/').once('value').then(snapshot => {
@@ -290,7 +275,6 @@ export function joinDB(roomName){
           roomId = roomName;
           database.ref(roomId+'/currentlyPlaying/songInfo/').once('value').then(snapshot => {
              dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
-
           })
           database.ref(roomId+'/isPlaying/').once('value').then(snapshot => {
              dispatch({ type: TOGGLE_SONG, data: snapshot.val()});
@@ -312,10 +296,7 @@ export function joinDB(roomName){
   }
 }
 
-// export function addSongToQueue(){
-//   spotifyApi.addTracksToPlaylist(userId, playlistId, orderedlist[0].uri).then(()=> nextSong())
-// }
-
+// add song to the database
 export function postSong(name, artist, time, picture, id, uri){
     return database.ref(roomId + '/numOfSongs').once('value').then(snapshot => {
       if(snapshot.val() < 15){
@@ -330,6 +311,9 @@ export function postSong(name, artist, time, picture, id, uri){
           votecount: 1,
           voters: {[userId]: true}
         })
+        database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
+          return numOfSongs = numOfSongs + 1
+        })
       }
       else{
         return false
@@ -339,7 +323,7 @@ export function postSong(name, artist, time, picture, id, uri){
 }
 
 
-
+// order the songs in the database and return it
 export function orderSongs(){
    return dispatch => {
          let orderedlist = [];
@@ -359,81 +343,7 @@ export function orderSongs(){
   }
 }
 
-export function toggleLoadSongs(){
-   return dispatch => {
-        dispatch({ type: TOGGLE_LOADSONGS});
-  }
-}
-
-
-  // database.ref(roomId + '/songs/').on('child_changed', function(snapshot){
-  //   return dispatch => {
-  //     // console.log(snapshot.val())
-  //     dispatch({ type: SONGS, data: snapshot.val() });
-  //   }
-  // })
-// function update(aux){
-//   console.log(aux)
-//   return dispatch => {
-//     dispatch({ type: SPOTIFY_ME_BEGIN});
-//     dispatch({ type: SPOTIFY_ME_SUCCESS, data: aux });
-//   }
-// }
-// const fromDb = (db, dispatch) => {
-//   db.ref('/songs/').on('value', data => {
-//     console.log('1')
-//     if (data.val()) {
-//       console.log('dasd')
-//       dispatch({ type: 'SET_MESSAGE', payload: data.val() });
-//     }
-//   });
-// };
-// fromDb(database, dispatch)
-
-// export function getNumOfSongs(uri){
-//   let orderedlist = [];
-//    database.ref('/songs/').once('value').then(function(snapshot){
-//       orderedlist = Object.values(snapshot.val());
-//       orderedlist.sort(function(a,b) {
-//          return b.votecount - a.votecount;
-//       })
-//       // dispatch({ type: SONGS, data: [orderedlist] });
-//       console.log(snapshot.val(), orderedlist)
-//       // if(!orderedlist){
-//       // spotifyApi.addTracksToPlaylist(userId, playlistId, uri)
-//       // }
-//   })
-// }
-
-// let num;
-// export function getNum(){
-//   let val;
-//    database.ref('/songs/').once('value').then(function(snapshot){
-//       console.log(snapshot.val())
-//       if (snapshot.val() == null){
-//         return 'fdsfndksflnd'
-//       }
-
-//     })
-// }
-
-
-
-export function order(){
-    let orderedlist = [];
-    return  database.ref(roomId+ '/songs/').once('value').then(function(snapshot){
-        orderedlist = Object.values(snapshot.val());
-        orderedlist.sort(function(a,b) {
-          return b.votecount - a.votecount;
-        });
-        return orderedlist
-  });
-}
-
-
-
-
-
+//increment vote
 export function increment(id, user_id3){
 
   var ref = database.ref(roomId+'/songs/' + id);
@@ -474,24 +384,5 @@ export function getMyInfo() {
     });
   };
 }
-
-
-
-export function remove(id){
-  database.ref(roomId+'/songs/' + id).remove();
-}
-
-
-
-export function getCurrent(){
-
-  let details;
-  return spotifyApi.getMyCurrentPlayingTrack().then(function(data){
-      return [data.item, data.context.uri]
-    })
-}
-
-
-    
 
 

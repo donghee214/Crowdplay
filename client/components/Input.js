@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
 
-// import {
-//   getMyInfo,
-//   setTokens,
-// }   from '../actions/actions';
 
 /**
  * Our user page

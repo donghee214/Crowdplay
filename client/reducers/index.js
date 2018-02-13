@@ -1,16 +1,14 @@
 import {
-  SPOTIFY_TOKENS, SPOTIFY_ME_BEGIN, SPOTIFY_ME_SUCCESS, SPOTIFY_ME_FAILURE, SPOTIFY_SEARCH_LOADING,SPOTIFY_SEARCH_DONE, SONGS
-  ,GETSONGS_BEGIN, GETSONGS_END, ADD_SONGS,TOGGLE_LOADSONGS, ADD_SONGS_DONE, UPDATE_VOTE, PLAYBACK_PLAYING,
+  SPOTIFY_TOKENS, SPOTIFY_ME_BEGIN, SPOTIFY_ME_SUCCESS, SPOTIFY_ME_FAILURE,
+  GETSONGS_BEGIN, GETSONGS_END, ADD_SONGS, UPDATE_VOTE,
   REMOVE_SONGS, CHANGE_CURRENTSONG, SET_ROOMNAME, JOIN_ROOMNAME, TOGGLE_SONG, DEVICES
 } from '../actions/actions';
 import update from 'immutability-helper';
 
 /** The initial state; no tokens and no user info */
 const initialState = {
-  tracks: {loading:null},
   accessToken: null,
   refreshToken: null,
-  playback: false,
   room: {
     roomName: 'aw fuck',
     roomType: false,
@@ -46,87 +44,54 @@ const initialState = {
   }
 };
 
-/**
- * Our reducer
- */
+
 export default function reduce(state = initialState, action) {
   switch (action.type) {
-  // when we get the tokens... set the tokens!
+  // Set the access tokens
   case SPOTIFY_TOKENS:
     const {accessToken, refreshToken} = action;
     return Object.assign({}, state, {accessToken, refreshToken});
 
-  // set our loading property when the loading begins
+  // Set loading screen while getting user
   case SPOTIFY_ME_BEGIN:
     return Object.assign({}, state, {
       user: Object.assign({}, state.user, {loading: true})
     });
 
-  // when we get the data merge it in
+  // Show the user the stuff after it finishes loading
   case SPOTIFY_ME_SUCCESS:
     return Object.assign({}, state, {
       user: Object.assign({}, state.user, action.data, {loading: false})
     });
 
-  // currently no failure state :(
+  // Show the user something went wrong
   case SPOTIFY_ME_FAILURE:
     return state;
-  case 'SET_MESSAGE':
-      return {
-        message: action.payload
-  };
-  case SPOTIFY_SEARCH_LOADING:
-    console.log('START')
-    return Object.assign({}, state, {
-      tracks: Object.assign({}, state.tracks, {loading: true})
-    });
-  case SPOTIFY_SEARCH_DONE:
-  console.log('DONE')
-    return Object.assign({}, state, {
-      tracks: Object.assign({}, action.data, {loading: false})
-    });
-
-  case SONGS:
-    return Object.assign({}, {
-      tracks: Object.assign({}, action.data, {loading: false})
-    });
   case GETSONGS_BEGIN:
     return Object.assign({}, state, {
       songList: Object.assign({}, state.songList, {loading: true}, {reloadAll: false})
     });
 
+
+  // Return the songs that are currently in the db
   case GETSONGS_END:
     return Object.assign({}, state, {
       songList: Object.assign({}, {list:action.data}, {loading: false}, {reloadAll:true}, {user: state.user.id})
     });
 
+  // Yeah, just update the list with the added songs
   case ADD_SONGS:
-    // let newArr = state.songList.list.slice(0)
-    // newArr.push(action.data)
     return Object.assign({}, state, {
       songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id})
     });
 
-  case ADD_SONGS_DONE:
-    return Object.assign({}, state, {
-      songList: Object.assign({}, {list: state.songList.list}, {loading: false}, {add:false}, {user: state.user.id})
-    });
-
-  case TOGGLE_LOADSONGS:
-    return Object.assign({}, state, {
-      songList: Object.assign({}, state.songList, {loading: false}, {reloadAll:!state.songList.reloadAll})
-    });
-
-  case PLAYBACK_PLAYING:
-   return Object.assign({}, state, {
-      playback: action.data
-    });
-
+  // Remove a song, and return the updated list
   case REMOVE_SONGS:
     return Object.assign({}, state, {
       songList: Object.assign({}, {list: action.data}, {loading: false}, {type:'song'}, {user: state.user.id})
     });
 
+  // Update the main song
   case CHANGE_CURRENTSONG:
     return Object.assign({}, state, {
       currentSong: Object.assign({}, {name: action.data.SongName},
@@ -135,6 +100,7 @@ export default function reduce(state = initialState, action) {
           {picture: action.data.picture}
         )
     });
+  // Update the vote prop
   case UPDATE_VOTE:
       return update(state,{
           songList: {list: {
@@ -155,12 +121,10 @@ export default function reduce(state = initialState, action) {
       room: Object.assign({},  {roomName: action.data}, {roomType: false}),
     });
   case TOGGLE_SONG:
-    // console.log(action.data)
     return Object.assign({}, state, {
       isPlaying: action.data,
     });
   case DEVICES:
-    // console.log(action.data)
     return Object.assign({}, state, {
       device: action.data
     });

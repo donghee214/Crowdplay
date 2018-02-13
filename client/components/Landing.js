@@ -37,6 +37,9 @@ class Landing extends Component {
     const {accessToken, refreshToken} = params;
     dispatch(setTokens({accessToken, refreshToken}));
     dispatch(getMyInfo())
+    if("room" in params){
+      this.join(params.room)
+    }
 
   }
   toggleDropDown(){
@@ -72,6 +75,9 @@ class Landing extends Component {
     dispatch(joinDB(roomName)).then((result) => {
       if(result){
           this.setState({votingRoom: true})
+          if('room' in this.props.params){
+            return
+          }
           this.toggleDropDown()
       }
       else{

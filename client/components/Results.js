@@ -47,7 +47,7 @@ class Results extends Component  {
         <h2 className="searchText">
           Search Results<span className="periodSmaller">.</span>
         </h2>
-        {this.props.tracks.loading ? <h1>Loading</h1> : this.state.songs}
+        {this.state.songs}
       </div>
     );
 

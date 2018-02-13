@@ -31,12 +31,25 @@ h3{
     font-size: 15px;
     
   }
+  body{
+    height: 100vh !important; 
+  }
+}
+
+.deleteFont{
+     position: absolute;
+    left: 40px;
+    top: 46px;
+    color: white;
+    font-weight: 500;
+    font-size: 18px;
 }
 body{
   top: 0px;
   position: absolute;
   width: 100vw;
   margin: 0;
+  overflow-x: hidden;
   /* height: calc(~'100% - 65px'); */
   height: -webkit-calc(~'100% - 65px');
   height: -o-calc(1~'100% - 65px'); /* opera */
@@ -49,10 +62,76 @@ body{
     height: 100%;
     top: 0;
     position: absolute;
-    background-size: contain;
-    background-position: center;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.backgroundImageMain{
+   display: none;
 }
   
+@media only screen and (min-width:1025px) {
+  .backgroundImageMain{
+      display: block;
+    width: 50vh;
+    /* height: 50%; */
+    position: relative;
+    /* left: 25%; */
+    background-size: contain;
+    background-position: center;
+    /* top: 25%; */
+    padding-top: 50vh;
+    }
+}
+
+.optionContainer{
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    padding-top: 100%;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.optionContainerLight{
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    /* visibility: hidden; */
+    width: 100%;
+    padding-top: 100%;
+}
+
+.option1{
+    top: 5px;
+    position: absolute;
+    height: 35px;
+    width: 35px;
+    fill: #FFF;
+}
+
+.optionGreen{
+  top: 5px;
+  position: absolute;
+  height: 35px;
+  width: 35px;
+  fill: #1ED760;
+}
+
+@media only screen and (min-width:1025px) {
+  .option1{
+    cursor: pointer;
+  }
+  .optionGreen{
+    cursor: pointer;
+  }
+}
+
 
 .errorMessage{
     position: fixed;
@@ -80,6 +159,12 @@ body{
   }
 }
 
+.delete{
+    position: absolute;
+    top: 40px;
+    width: 35px;
+    height: 35px;
+}
 
 
 .visible{
@@ -227,14 +312,12 @@ body{
 
 @media only screen and (min-width:1025px) {
   .controlButton{
-    width:35px;
-    height:35px;
+    width:30px;
+    height:30px;
     cursor: pointer;
   }
-  .controlContainer{
-    margin-bottom: 20px;
-  }
 }
+
 
 
 .controlButtonLarge{
@@ -245,10 +328,9 @@ body{
 
 @media only screen and (min-width:1025px) {
   .controlButtonLarge{
-    width:70px;
-    height:70px;
+    width:60px;
+    height:60px;
     cursor: pointer;
-    
   }
 }
 
@@ -309,7 +391,7 @@ body{
 @media only screen and (min-width:1025px) {
   .title{
     margin-top: 5%;
-    font-size: 70px;
+    font-size: 40px;
   }
 }
 
@@ -320,11 +402,33 @@ body{
 
 @media only screen and (min-width:1025px) {
   .subtitle{
-   font-size:40px;
+   font-size:30px;
     
   }
 }
 
+
+.backgroundImg{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  background-position: center;
+  background-size: contain;
+}
+
+@media only screen and (min-width:1025px) {
+  .backgroundImg{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    background-position: center;
+    background-size: cover;
+    filter: blur(12.5px);
+    transform: scale(1.1)
+  }
+}
 
 .controls{
   display: -ms-flexbox;
@@ -332,8 +436,8 @@ body{
   height: 100vw;
   width: 100%;
   position: absolute;
-  -ms-flex-pack: space-evenly;
-  justify-content: space-evenly;
+  -ms-flex-pack: space-around;
+  justify-content: space-around;
   -ms-flex-align: center;
   align-items: center;
   bottom: 0%;
@@ -344,16 +448,20 @@ body{
 
 @media only screen and (min-width:1025px) {
   .controls{
-    width:100%;
-    height:80%;
-    bottom: 20%; 
-    align-items: flex-end; 
+    width: 30%;
+    /* height: 100%; */
+    -ms-flex-align: center;
+    align-items: center;
+    top: 7%;
+    /* justify-content: center; */
+    /* height: 30%; */
+    height: 120px;
 
   }
 }
 .options{
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
   width: 100%;
   margin-top: 50%;
 }
@@ -622,6 +730,10 @@ cursor: pointer;
   color: #efefef;
   margin:  0;
   margin-top: 0px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 85%;
 }
 
 @media only screen and (min-width:1025px) {
@@ -637,8 +749,9 @@ cursor: pointer;
     flex-direction: column;
     height: 70%;
     position: absolute;
-    width: 100%;
-    top: .5%;
+    width: 60%;
+    left: 20%;
+    top: 4%;
     -ms-flex-pack: start;
     justify-content: flex-start;
     -ms-flex-align: center;
@@ -648,8 +761,8 @@ cursor: pointer;
 
 .songBoxUp{
   fill: white;
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
 }
 
 @media only screen and (min-width:1025px) {
@@ -660,8 +773,8 @@ cursor: pointer;
 
 .songBoxUpGreen{
   fill: #1ED760;
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
 }
 
 @media only screen and (min-width:1025px) {
@@ -858,7 +971,7 @@ input:focus:-ms-input-placeholder { color:transparent; }
   width: 100%;
   height: calc(~'100vh - 65px');
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
 }
 
@@ -882,9 +995,15 @@ input:focus:-ms-input-placeholder { color:transparent; }
 }
 
 .roomHead{
-  font-size: 22px;
+  font-size: 20px;
   margin-top: -2.5px;
   margin-bottom: 0;
+  font-weight: 300;
+}
+
+.nameId{
+  font-weight: 600;
+  color:#1ED760; 
 }
 .dropButton{
     border-bottom: 1px solid #FFF;
@@ -894,6 +1013,9 @@ input:focus:-ms-input-placeholder { color:transparent; }
 @media only screen and (min-width:1025px) {
   .dropButton{
     cursor: pointer;
+  }
+  .roomHead{
+    font-size: 28px;
   }
 }
 

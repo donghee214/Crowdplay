@@ -22,9 +22,9 @@ export default class Header extends React.Component  {
       	{this.props.roomType ? <Setting devicesClicked={this.props.devicesClicked} device={this.props.device}/>:null}
         <div className="titleContainer">
 	        <h3>
-	        	Room Name:
+	        	Join at:
 	        </h3>
-        	<h1 className="roomHead">{this.props.roomName}</h1>
+        	<h1 className="roomHead">crowdplay.me/<span className="nameId">{this.props.roomName}</span></h1>
        	
         </div>
         <Share/>
