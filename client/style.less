@@ -37,9 +37,6 @@ h3{
 }
 
 .deleteFont{
-     position: absolute;
-    left: 40px;
-    top: 46px;
     color: white;
     font-weight: 500;
     font-size: 18px;
@@ -51,10 +48,7 @@ body{
   margin: 0;
   overflow-x: hidden;
   /* height: calc(~'100% - 65px'); */
-  height: -webkit-calc(~'100% - 65px');
-  height: -o-calc(1~'100% - 65px'); /* opera */
-  height: -webkit-calc(100% - 65px); /* google, safari */
-  height: -moz-calc(100% - 65px); /* firefox */
+ /* s */
 }
 
 .firstsongContainer{
@@ -107,19 +101,23 @@ body{
     padding-top: 100%;
 }
 
+.optionButton{
+  position: absolute !important;
+  top: 7.5px;
+  left: 0px;
+}
+
 .option1{
-    top: 5px;
-    position: absolute;
-    height: 35px;
-    width: 35px;
+    /* position: absolute; */
+    height: 40px;
+    width: 40px;
     fill: #FFF;
 }
 
 .optionGreen{
-  top: 5px;
-  position: absolute;
-  height: 35px;
-  width: 35px;
+  /* position: absolute; */
+  height: 40px;
+  width: 40px;
   fill: #1ED760;
 }
 
@@ -129,6 +127,17 @@ body{
   }
   .optionGreen{
     cursor: pointer;
+  }
+  .option1{
+    /* position: absolute; */
+    height: 35px;
+    width: 35px;
+}
+
+  .optionGreen{
+    /* position: absolute; */
+    height: 35px;
+    width: 35px;
   }
 }
 
@@ -153,15 +162,31 @@ body{
     box-sizing: border-box;
 }
 
+.optionItem{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.optionItemContainer{
+  position: absolute;
+  top: 45px;
+  left: 2.5px;
+  display: flex;
+  align-items: flex-start;
+}
+
 @media only screen and (min-width:1025px) {
   .devicesList{
     padding: 0 2vw 0 2vw;
   }
+
+  .optionItem{
+    cursor: pointer;
+  }
 }
 
 .delete{
-    position: absolute;
-    top: 40px;
     width: 35px;
     height: 35px;
 }
@@ -192,6 +217,18 @@ body{
   height: 100px;
   margin-top: 0;
 }
+
+.shareInput{
+  position: absolute;
+  background-color: transparent;
+  color: transparent;
+  border: none;
+  z-index: -5;
+}
+
+
+
+
 
 @media only screen and (min-width:1025px) {
   .refresh{
@@ -253,14 +290,13 @@ body{
   width: 100%;
   position: absolute;
   top: 100vw;
-  left: 0;
+  right: 0;
 
 }
 @media only screen and (min-width:1025px) {
   .upNext{
-    width:35%;
+    width:30%;
     top:0;
-    left:65%;
     height: 100vh;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -461,7 +497,7 @@ body{
 }
 .options{
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 100%;
   margin-top: 50%;
 }
@@ -494,6 +530,7 @@ body{
   border: 1px solid white;
   flex-direction: column;
   background-color: transparent;
+  margin: 0 2vw 0 2vw;
 }
 
 @media only screen and (min-width:1025px) {
@@ -549,23 +586,49 @@ a{
 
 .backdrop{
   background-color: #FF3366;
-  position: absolute;
+  position: fixed;
   width: 100%;
-  height: 90%;
+  height: 100%;
   top: 0;
-  left: 0;
+  right: 0;
   z-index: 2;
   -webkit-box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
--moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
-box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
-overflow: hidden;
+  -moz-box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
+  box-shadow: 3px 3px 5px 0px rgba(0,0,0,1);
+  overflow: hidden;
+}
+
+.browse{
+      height: calc(~'100% - 110px');
+    overflow-y: scroll;
 }
 
 @media only screen and (min-width:1025px) {
   .backdrop{
-    width:35%;
-    left:65%;
+    width:30%;
+
   }
+}
+
+.browseIcon{
+  width: 60px;
+  height: 60px;
+}
+
+.trigger{
+  width: 100%;
+  position: absolute;
+  height: 50%;
+  bottom: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.browseSongs{
+  font-size: 25px;
+  border-bottom: 1px solid #FFF;
 }
 
 .up{
@@ -617,7 +680,7 @@ cursor: pointer;
 }
 
 .searchSong{
-  text-align: left !important;
+  text-align: center;
   font-weight: 600;
   width: 82vw;
   margin-top: -4px;
@@ -743,15 +806,15 @@ cursor: pointer;
 }
 
 .votes{
-    display: -ms-flexbox;
+     display: -ms-flexbox;
     display: flex;
     -ms-flex-direction: column;
     flex-direction: column;
-    height: 70%;
+    height: 57%;
     position: absolute;
     width: 60%;
     left: 20%;
-    top: 4%;
+    top: -1%;
     -ms-flex-pack: start;
     justify-content: flex-start;
     -ms-flex-align: center;
@@ -761,8 +824,8 @@ cursor: pointer;
 
 .songBoxUp{
   fill: white;
-  width: 55px;
-  height: 55px;
+  width: 75px;
+  height: 75px;
 }
 
 @media only screen and (min-width:1025px) {
@@ -773,8 +836,8 @@ cursor: pointer;
 
 .songBoxUpGreen{
   fill: #1ED760;
-  width: 55px;
-  height: 55px;
+  width: 75px;
+  height: 75px;
 }
 
 @media only screen and (min-width:1025px) {
@@ -840,7 +903,16 @@ font-size: 14px;
     height: 33px;
     width: 33px;
     top: -3px;
-    right: 0;
+    right: 3px;
+}
+
+.notaddedGreen{
+   position: absolute;
+    height: 33px;
+    width: 33px;
+    top: -3px;
+    right: 3px;
+    fill: #1ED760;
 }
 
 .searchTitle{
@@ -861,7 +933,6 @@ font-size: 14px;
 
 
 .topContent{
-  height: 80px;
   width: 100%;
   box-sizing: border-box;
   top: 0;
@@ -871,7 +942,7 @@ font-size: 14px;
   flex-direction: column;
   /* align-items: center; */
   /* margin-top: 10px; */
-  align-items: flex-start;
+  align-items: center;
   padding: 20px 9vw 25px 9vw;
 
   /* margin-bottom: 18vw; */
@@ -969,7 +1040,7 @@ input:focus:-ms-input-placeholder { color:transparent; }
 .login{
   display: flex;
   width: 100%;
-  height: calc(~'100vh - 65px');
+  height: 100vh;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
@@ -1043,7 +1114,7 @@ input:focus:-ms-input-placeholder { color:transparent; }
 
 @media only screen and (min-width:1025px) {
   .currentlyPlaying{
-    width:65%;
+    width:70%;
     height:100%;
   }
 }
@@ -1124,13 +1195,6 @@ input:focus:-ms-input-placeholder { color:transparent; }
   margin-bottom: 0px;
 }
 
-@media only screen and (min-width:1025px) {
-  .addSub{
-    margin-top: 6px;
-    font-size:20px;
-    
-  }
-}
 
 .addContainer{
   margin-top: 20%;
@@ -1160,6 +1224,71 @@ input:focus:-ms-input-placeholder { color:transparent; }
     margin: 0;
     font-size: 45px;
     margin: -10px 0 -10px 0;
+}
+
+/* .browse{
+  box-sizing: border-box;
+  padding:  20px 9vw 25px 9vw;
+} */
+
+.button{
+    width: 50px;
+    height: 50px;
+    /* border-radius: 50%; */
+    position: absolute;
+    left: calc(~'50% - 25px');
+    top: 15%;
+    /* border: 1px solid #FF3366; */
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.addSong1{
+  width: 50px;
+  height: 50px;
+  fill: #1ED760;
+}
+
+.addSongWhite{
+    width: 50px;
+    height: 50px;
+    fill: #FFF;
+}
+
+.suggestionTitle{
+  margin: 0;
+  font-size: 25px;
+  margin-top: -5px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.suggestions{
+  width: 100%;
+  overflow-x: scroll;
+  white-space:nowrap;
+  left: 0;
+  /* position: absolute; */
+}
+
+.songBoxSearch{
+  position: relative;
+  display: inline-block;
+  width: 140px;
+  height: 140px;
+  margin: 0 5px 0 5px;
+}
+
+@media only screen and (min-width:1025px) {
+  .addSub{
+    margin-top: 6px;
+    font-size:20px;
+    
+  }
 }
 
 .cbutton1{
@@ -1256,11 +1385,11 @@ user-select: none;
 .cbutton::after {
   content: '';
   position: absolute;
-  top: 45%;
+  top: 53%;
   left: 50%;
-  margin: -35px 0 0 -35px;
-  width: 70px;
-  height: 70px;
+  margin: -42.5px 0 0 -42.5px;
+  width: 85px;
+  height: 85px;
   border-radius: 50%;
   opacity: 0;
   pointer-events: none;
@@ -1268,20 +1397,26 @@ user-select: none;
 
 .cbutton--effect-ivana::before {
   position: absolute;
-  top: 45%;
+  top: 53%;
   left: 50%;
-  margin: -35px 0 0 -35px;
-  width: 70px;
-  height: 70px;
+  margin: -42.5px 0 0 -42.5px;
+  width: 85px;
+  height: 85px;
   border-radius: 50%;
   content: '';
   opacity: 0;
   pointer-events: none;
 }
 
+
 .cbutton--effect-ivana::before,
 .cbutton--effect-ivana::after {
   box-shadow: 0 0 0 4px rgba(255,255,255,0.7);
+}
+
+.green::before,
+.green::after{
+  box-shadow: 0 0 0 4px rgba(30,215,96, 0.7);
 }
 
 .cbutton--effect-ivana.cbutton--click::before {
@@ -1294,33 +1429,36 @@ user-select: none;
   animation: anim-effect-ivana-2 0.5s forwards;
 }
 
-.cbutton--effect-ivana1::before {
-  position: absolute;
+
+.optionAni::before{
   top: 45%;
-  left: 50%;
-  margin: -35px 0 0 -35px;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  content: '';
-  opacity: 0;
-  pointer-events: none;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
 }
 
-.cbutton--effect-ivana1::before,
-.cbutton--effect-ivana1::after {
-  box-shadow: 0 0 0 4px rgba(30,215,96, 0.7);
+.optionAni::after{
+  top: 45%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
 }
 
-.cbutton--effect-ivana1.cbutton--click::before {
-  -webkit-animation: anim-effect-ivana-1 0.5s forwards;
-  animation: anim-effect-ivana-1 0.5s forwards;
+.controlAni::before{
+  width: 80px;
+  height: 80px;
+  top: 45%;
+  margin: -40px 0 0 -40px;
 }
 
-.cbutton--effect-ivana1.cbutton--click::after {
-  -webkit-animation: anim-effect-ivana-2 0.5s forwards;
-  animation: anim-effect-ivana-2 0.5s forwards;
+.controlAni::after{
+  width: 80px;
+  height: 80px;
+  top: 45%;
+  margin: -40px 0 0 -40px;
 }
+
+
 
 @-webkit-keyframes anim-effect-ivana-1 {
   0% {
@@ -1372,4 +1510,41 @@ user-select: none;
     -webkit-transform: scale3d(1.2, 1.2, 1);
     transform: scale3d(1.2, 1.2, 1);
   }
+}
+
+
+.suggestions::-webkit-scrollbar {
+    width: 15px;
+    height: 7.5px;
+    position: absolute;
+    background: transparent;
+}
+ 
+.suggestion::-webkit-scrollbar-track{
+  width: 0;
+  height: 0;
+  margin-top: -10px;
+    background: transparent;
+} 
+.suggestions::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+/*   outline: 1px solid slategrey; */
+}
+
+.shareButton{
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.message{
+  position: fixed;
+  top: 11vh;
+  width: 100vw;
+  text-align: center;
+  left: 0;
+
 }

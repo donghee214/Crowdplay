@@ -38,14 +38,9 @@ class Votingroom extends Component{
           <Header roomType={this.props.room.roomType} devicesClicked={this.props.devicesClicked} device = {this.props.device} roomName={this.props.room.roomName}/> 
           <FirstSong isPlaying ={this.props.isPlaying} device = {this.props.device} play={this.nextSong.bind(this)} pause={this.pauseSong.bind(this)} background={this.props.Votingroom.picture} timebox={this.props.Votingroom.time} artist ={this.props.Votingroom.artist} title={this.props.Votingroom.name} roomType={this.props.room.roomType}/>
         </div>
-        <div style={{display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width:'100%',
-                    height: '50vw',
-          }}>
+ 
        <SongSection searchClicked={this.props.searchClicked}/>
-        </div>
+      
       
       </div>
     );

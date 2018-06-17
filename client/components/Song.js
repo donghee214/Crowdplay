@@ -42,7 +42,7 @@ export default class Song extends React.Component{
               WebkitTransform: `translate3d(${this.props.position[0]}%, ${this.props.position[1]}%, 0)`,
               transform: `translate3d(${this.props.position[0]}%, ${this.props.position[1]}%, 0)`,
             }}>
-            {this.props.roomType ? <Options songId={this.props.info.songId} /> : null}
+            <Options roomType={this.props.roomType} adder={this.props.info.adder} songId={this.props.info.songId} />
             <div className="votes">
                 <Up toggle ={this.toggle.bind(this)} userId={this.props.userId} voters={this.props.info.voters}/>
                 <h2 className="value">

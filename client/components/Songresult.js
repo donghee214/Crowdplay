@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import NotAdded from './svgs/NotAdded.js'
-import Added from './svgs/added.js';
+import NotAdded from './svgs/Add.js'
+import Added from './svgs/Check.js';
 
 
 export default class Songresult extends React.Component  {
@@ -10,13 +10,33 @@ export default class Songresult extends React.Component  {
     // console.log(this.props.info)
   }
 
+  clickHandle(){
+    if(this.state.added){
+       this.deleteSong()
+    }
+    else{
+      this.addSong()
+    }
+
+  }
+
   addSong(){
-    this.setState({added:true})
     this.props.postSong(this.props.info.name, this.props.info.artists, this.props.info.duration_ms, this.props.info.album.images[0].url, this.props.info.id, this.props.info.uri).then((res) => {
       if(res === false){
         alert('too many songs')
         this.setState({added:false})
+        return
       }
+    })
+    this.setState({added:true})
+  }
+
+  deleteSong(){
+    this.props.deleteSong(this.props.info.id, this.props.info.adder).then((res) => {
+        if(res === true){
+          this.setState({added: false})
+        }
+        
     })
   }
 
@@ -48,7 +68,7 @@ export default class Songresult extends React.Component  {
   }
   render() {
     return (
-      <div className="songResult" onClick = {this.addSong.bind(this)}>
+      <div className="songResult" onClick = {this.clickHandle.bind(this)}>
         <h1 className="searchTitle">
           {this.props.info.name}
         </h1>
@@ -56,7 +76,7 @@ export default class Songresult extends React.Component  {
           {this.returnArtist()}
         </div>
         {this.returnTime()}
-        {this.state.added ? <Added/>: <NotAdded/>}
+        {this.state.added ? <Added styling={"notaddedGreen"}/>: <NotAdded styling={"notadded"}/>}
       </div>
     );
   }

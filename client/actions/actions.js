@@ -1,12 +1,13 @@
 import Spotify from 'spotify-web-api-js';
 import database from '../database.js';
+// import player from '../spotifyPlayer.js'
 const spotifyApi = new Spotify();
 
 let roomId = null;
 let songList = [];
 let userId = null;
+let isHost = false;
 let activeDevice = null;
-let deleted = false;
 
 // our constants
 export const SPOTIFY_TOKENS = 'SPOTIFY_TOKENS';
@@ -33,83 +34,100 @@ export function setTokens({accessToken, refreshToken}) {
   return { type: SPOTIFY_TOKENS, accessToken, refreshToken };
 }
 
-// function that runs in the background to keep checking the timestamp on the song playing
-const refresh = function(){
-     spotifyApi.getMyCurrentPlayingTrack().then(function(data){
-      if(data.item.duration_ms - data.progress_ms < 5500){
-        setTimeout(function(){
-         nextSong()
-          }, data.item.duration_ms - data.progress_ms - 500);
-      }
-      else{
-        setTimeout(refresh, 5000);
-      }
-     })
-}
 
-export function deleteSong(songId){
-  console.log('delete started')
-  deleted = true
-  console.log(deleted)
-  database.ref(roomId + '/songs/' + songId).remove()
-  
+
+function refreshToken(callback){
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (this.readyState == 4) {
+      spotifyApi.setAccessToken(this.responseText)
+      callback()
+    }
+  };
+  xhr.open('GET', '/refreshToken', true);
+  xhr.send();
 }
 
 // function to change to the next song
-export function nextSong(context){    
-      clearTimeout(refresh)
-      let orderedlist =[];
-      database.ref(roomId+'/songs/').once('value').then(snapshot => {
-      const aux = snapshot.val()
-      if(aux){
-          orderedlist = Object.values(aux);
+export function nextSong(){  
+      if(songList.length <= 0){
+        spotifyApi.pause({})
+        database.ref(roomId+'/currentlyPlaying/').set({
+          songInfo: {
+            SongName: 'none',
+            artist: ['None'],
+            time: '4:20',
+            picture: null,
+          }
+        })
+      }
+      else{
+        let orderedlist =[];
+        database.ref(roomId+'/songs/').once('value').then(snapshot => {
+          orderedlist = Object.values(snapshot.val());
           orderedlist.sort(function(a,b) {
             return b.votecount - a.votecount;
         });
-        spotifyApi.play({"uris": [orderedlist[0].uri], "device_id": activeDevice.id}).then((res) => {
+        (function play() {spotifyApi.play({"uris": [orderedlist[0].uri], "device_id": activeDevice.id}).then((res) => {   
+            
             database.ref(roomId+'/currentlyPlaying/').set({
               songInfo: orderedlist[0]
             })
-            setTimeout(refresh, 5000)
           }).catch(e => {
-            console.log('CAUGHT SOME ERROR', e)
-        })
+            console.error(e, "this is the expired message")
+            if(e.status === 401){
+                refreshToken(play)
+            }
+          })
+        })()
         database.ref(roomId+'/songs/' + orderedlist[0].songId).remove() 
-        database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
-          return numOfSongs = numOfSongs - 1
-        })
+        });
       }
-      //show no song remaining
-      else{
-          spotifyApi.pause({})
-          database.ref(roomId+'/currentlyPlaying/').set({
-            songInfo: null
-          })
-          database.ref(roomId + '/songs/'+ 'noSong').set({
-              SongName: "No song Chosen",
-              artist:'noArtist',
-              time:'4:20',
-              picture:null,
-              songId:null,
-              uri:null,
-              upvote: 'Empty',
-              votecount: 1,
-              voters: {[userId]: true}
-          }).then(() => {
-            database.ref(roomId+'/songs/' +'noSong').remove() 
-          })
+  }
+
+export function deleteSong(songId, accountId){
+    if(isHost || userId === accountId){
+      return database.ref(roomId + '/songs/' + songId).remove().then((res) => {return true})
+    }
+    else{
+      return Promise.resolve(false)
+    }
+}
+
+
+
+
+export function watchSongRemoved(dispatch){
+  database.ref(roomId+'/songs').on('child_removed', function(snapshot){
+    for(let i = 0; i < songList.length; i++){
+      if(songList[i].songId === snapshot.val().songId){
+        songList.splice(i, 1)
       }
-      }).catch(e => {
-          console.log(e)
-      });
-    
+    }
+    dispatch({ type: REMOVE_SONGS, data: songList});
+  });
+}
+
+export function watchSongChange(dispatch) {
+  database.ref(roomId+'/currentlyPlaying').on('child_changed', (snapshot) => {
+    for(let i = 0; i < songList.length; i++){
+      if(songList[i].songId === snapshot.val().songId){
+        songList.splice(i, 1)
+      }
+    }
+    songList.sort(function(a, b){
+      return b.votecount-a.votecount
+    })
+    dispatch({ type: REMOVE_SONGS, data: songList});
+    dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
+  });
 }
 
 //resume song if something is playing, else start the playlist
 export function resume(){
   return dispatch => {
-    database.ref(roomId+'/currentlyPlaying/').once('value').then(snapshot => {
-      if(snapshot.val()){
+    database.ref(roomId+'/currentlyPlaying/songInfo/SongName').once('value').then(snapshot => {
+      if(snapshot.val() !== 'none'){
         spotifyApi.play({})
       }
       else{
@@ -120,35 +138,101 @@ export function resume(){
   } 
 }
 
-//search for a song and return the results
-export function search(query){
-  let songs = {};
-  database.ref(roomId+'/songs/').once('value').then(snapshot => {
-    const res = snapshot.val()
-    if(res)
-      {songs = snapshot.val()}
-  })
-  return spotifyApi.search(query, 'track').then(function(data){
-      let ret = data.tracks.items.map(function(info){
+function parseSongList(data, songs){
+  // console.log(data)
+  return data.items.map(function(info){
         if(info.id in songs){
           return Object.assign ({}, info, {
-            added: true
+            added: songs[info.id].adder
           })
         }
         return Object.assign({}, info, {
           added: false
         }) 
-      })
-      return ret
+    })
+}
+
+function parseSongListPlaylist(data,songs){
+    console.log(songs)
+    return data.items.map(function(info){
+      if(info.track.id in songs){
+        return Object.assign ({}, info.track, {
+          added: songs[info.track.id].adder
+        })
+      }
+      return Object.assign({}, info.track, {
+        added: false
+      }) 
+  })
+}
+
+export function getSongsDb(){
+  return database.ref(roomId+'/songs/').once('value').then(snapshot => {
+    const res = snapshot.val()
+    if(res){
+      return res
+    }
+    return {}
+  })
+}
+
+
+//search for a song and return the results
+export function search(query){
+  let songs;
+  getSongsDb().then((response) => {
+    songs = response
+  })
+  return spotifyApi.search(query, 'track').then(function(data){
+        const ret = parseSongList(data.tracks, songs)
+        return ret
     }).catch(e => {
-     
+       console.error(e, "this is the expired message")
+          if(e.status === 401){
+              refreshToken(null)
+      }
     });  
 }
+
+export function returnTopChart(songs, owner, id){
+  return spotifyApi.getPlaylistTracks(owner, id, {'limit':10}).then(function(data){
+      // console.log(data)
+      const ret = parseSongListPlaylist(data, songs)
+      return ret
+    }).catch(e => {
+        console.error(e, "this is the expired message")
+        if(e.status === 401){
+            refreshToken()
+        }
+    })
+}
+
+export function getSuggestions(songs){
+    // let songs = {}
+    // getSongsDb().then((response) => {
+    //   songs = response
+    // })
+    return spotifyApi.getMyTopTracks({'limit':10}).then(function(data){
+      // console.log(data)
+      const ret = parseSongList(data, songs)
+      return ret
+    }).catch(e => {
+        console.error(e, "this is the expired message")
+          if(e.status === 401){
+              refreshToken(getSuggestions)
+          }
+      })
+  }
 
 //pause the song and set it to false
 export function pause(){
   return dispatch => {
-    spotifyApi.pause({})
+    spotifyApi.pause({}).catch(e => {
+      console.error(e, "this is the expired message")
+      if(e.status === 401){
+          refreshToken(pause)
+      }
+  })
     database.ref(roomId+'/isPlaying/').set({
         isPlaying: false
     })
@@ -157,26 +241,7 @@ export function pause(){
 }
 
 //listener for when song is removed
-export function watchChildRemoved(dispatch) {
-  database.ref(roomId+'/songs/').on('child_removed', (snapshot) => {
-    console.log('remove detected')
-    for(let i = 0; i < songList.length; i++){
-      if(songList[i].songId === snapshot.val().songId){
-        songList.splice(i, 1)
-      }
-    }
-    songList.sort(function(a, b){
-      return b.votecount-a.votecount
-    })
-    dispatch({ type: REMOVE_SONGS, data: songList});
-    if(deleted){
-      deleted = false  
-    }
-    else{
-      dispatch({ type: CHANGE_CURRENTSONG, data: snapshot.val()});
-    }
-  });
-}
+
 
 //skip the song 
 export function skip(){
@@ -211,17 +276,18 @@ export function createDB(roomName){
         if(snapshot.val() && roomName in snapshot.val()){
           return false
         }
+        isHost = true;
         roomId = roomName;
-        database.ref(roomId).set({
-          numOfSongs:0,
-        })
         database.ref(roomId + '/people').set({
           host: userId
         })
-        
-        // console.log(spotifyApi)
-        setDefaultDevice().then(() => {
-          dispatch({type: DEVICES, data: activeDevice})
+        database.ref(roomId+ '/currentlyPlaying').set({
+          songInfo:{
+            SongName: 'none',
+            artist: ['None'],
+            time: '4:20',
+            picture: null,
+          }
         })
         dispatch({type : SET_ROOMNAME, data: roomId})
         return true
@@ -233,6 +299,11 @@ export function createDB(roomName){
 export function getDevices(){
   return spotifyApi.getMyDevices().then((devices) => {
     return devices.devices
+  }).catch(e => {
+      console.error(e, "this is the expired message")
+      if(e.status === 401){
+          refreshToken(getDevices)
+      }
   })
 }
 
@@ -242,18 +313,31 @@ export function changeDevice(device){
     return spotifyApi.transferMyPlayback([device.id]).then(() => {
       activeDevice = device
       dispatch({type: DEVICES, data: activeDevice}) 
+    }).catch(e => {
+        console.error(e, "this is the expired message")
+        if(e.status === 401){
+            refreshToken(changeDevice)
+        }
     })
       
   }
 }
 
 // set the active device to the first one in the list
-function setDefaultDevice(){
-    return spotifyApi.getMyDevices().then(function(devices){
+export function setDefaultDevice(){
+    return dispatch => {
+      spotifyApi.getMyDevices().then(function(devices){
       if(devices){
         for(let i = 0; i < devices.devices.length; i++){
-          if(devices.devices[i].is_active){
+          if(devices.devices[i].name === 'Crowdplay Web Player'){
             activeDevice = devices.devices[i]
+            spotifyApi.transferMyPlayback([activeDevice.id], {play: false}).catch(e => {
+                console.error(e, "this is the expired message")
+                if(e.status === 401){
+                    refreshToken()
+                }
+            }) 
+            dispatch({type: DEVICES, data: activeDevice})
             return
           }
         }
@@ -262,7 +346,8 @@ function setDefaultDevice(){
       else{
         activeDevice = null;
       }
-    })
+      })
+    }
 
 }
 
@@ -280,9 +365,7 @@ export function joinDB(roomName){
              dispatch({ type: TOGGLE_SONG, data: snapshot.val()});
           })
           if(userId == rooms[roomName].people.host){
-            setDefaultDevice().then(() => {
-              dispatch({type: DEVICES, data: activeDevice});
-            })
+            isHost = true;
             dispatch({type : SET_ROOMNAME, data: roomId})
             return true
           }
@@ -298,29 +381,25 @@ export function joinDB(roomName){
 
 // add song to the database
 export function postSong(name, artist, time, picture, id, uri){
-    return database.ref(roomId + '/numOfSongs').once('value').then(snapshot => {
-      if(snapshot.val() < 15){
-        database.ref(roomId + '/songs/'+ id).set({
-          SongName:name,
-          artist:artist,
-          time:time,
-          picture:picture,
-          songId:id,
-          uri:uri,
-          upvote: 'Empty',
-          votecount: 1,
-          voters: {[userId]: true}
-        })
-        database.ref(roomId+'/numOfSongs').transaction(function(numOfSongs){
-          return numOfSongs = numOfSongs + 1
-        })
-      }
-      else{
-        return false
-      }
-    })
 
-}
+    if (songList.length > 14){
+      return Promise.resolve(false)
+    }
+    return database.ref(roomId + '/songs/'+ id).set({
+              SongName:name,
+              artist:artist,
+              time:time,
+              picture:picture,
+              songId:id,
+              uri:uri,
+              upvote: 'Empty',
+              votecount: 1,
+              voters: {[userId]: true},
+              adder: userId
+            })
+          
+    }
+          
 
 
 // order the songs in the database and return it
@@ -352,16 +431,16 @@ export function increment(id, user_id3){
     ref.transaction(function(song) {
       if (song) {
 
-        if (song.voters && song.voters[user_id3]) {
+        if (song.voters && song.voters[userId]) {
           song.votecount--;
-          song.voters[user_id3] = false;
+          song.voters[userId] = false;
           // console.log('THISFAR')
         } else {
           song.votecount++;
           if (!song.voters) {
             song.voters = {};
           }
-          song.voters[user_id3] = true;
+          song.voters[userId] = true;
         }
       }
       return song
@@ -377,7 +456,7 @@ export function getMyInfo() {
     dispatch({ type: SPOTIFY_ME_BEGIN});
     spotifyApi.getMe().then(function(data){
       dispatch({ type: SPOTIFY_ME_SUCCESS, data: data });
-      userId = data.id
+      userId = data.id.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi, '');
     })
     .catch(e => {
       dispatch({ type: SPOTIFY_ME_FAILURE, error: e });

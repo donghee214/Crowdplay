@@ -6,8 +6,9 @@ import Song from './Song.js';
 import {
   orderSongs,
   watchGuestAddedEvent,
-  watchChildRemoved,
+  watchSongChange,
   voteListener,
+  watchSongRemoved
 } from '../actions/actions'
 
 class SongSection extends Component  {
@@ -40,7 +41,7 @@ class SongSection extends Component  {
 
   
   render() {    
-    // console.log('SONG SECTION RERENDER')
+    // console.log(this.props.songSection.list)
     return (
         <div className="upNext">
             <Add searchClicked={this.props.searchClicked} style="addContainerSong"/>}
@@ -62,7 +63,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   watchGuestAddedEvent(dispatch);
   voteListener(dispatch);
-  watchChildRemoved(dispatch);
+  watchSongChange(dispatch);
+  watchSongRemoved(dispatch);
     return {
     onOrderSongs() {
       return dispatch(orderSongs())

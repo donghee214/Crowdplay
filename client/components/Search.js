@@ -1,37 +1,39 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Results from './Results.js'
 import InputSearch from './InputSearch.js';
 
+import SuggestionTrigger from './SuggestionTrigger.js'
+// import SuggestionContainer from './Suggestion.js';
 
 export default class Search extends React.Component  {
   constructor(props){
     super(props)
     this.state ={
-      showResults: false,
-      query: null
+      query: null,
+      // showSuggestions: false
     }
   }
 
   search(evt, query){
-    // alert('called')
     if(evt){
       evt.target.children[0].blur()
       evt.preventDefault();
     }
 
-    this.setState({showResults:true, query: query})
+    this.setState({query: query})
     return false;
   }
-
+  shouldComponentUpdate(nextState){
+    return this.state.query !== nextState.query
+  }
   render() {
     return (
       <div className="search">
         <div className="topContent">
-          <h3 className="searchHelp">Search for songs, artists, and playlists</h3>
+          <h3 className="searchHelp">Search for songs and artists</h3>
           <InputSearch search = {this.search.bind(this)}/>
         </div>
-        {this.state.showResults ? <Results query={this.state.query}/> : null}
+        {this.state.query ? <Results query={this.state.query}/> : <SuggestionTrigger />}
       </div>
     );
 

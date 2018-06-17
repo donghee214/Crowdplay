@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Songresult from './Songresult.js'
 import {
   search,
   postSong,
+  deleteSong,
 }   from '../actions/actions';
 
-class Results extends Component  {
+export default class Results extends React.Component  {
   constructor(props){
       super(props)
       this.state = {songs: null}
@@ -29,11 +29,12 @@ class Results extends Component  {
       this.renderReturns(nextProps.query)
     }
   }
+  
   renderReturns(query){
     search(query).then((data) => {
       let songList = "No Results";
         songList = data.map((info) =>
-          <Songresult postSong={postSong} info = {info} key ={info.id}/>
+          <Songresult deleteSong={deleteSong} postSong={postSong} info = {info} key ={info.id}/>
         );
       this.setState({songs: songList})
     })
@@ -53,6 +54,3 @@ class Results extends Component  {
 
   }
 }
-
-
-export default connect(state => state)(Results);

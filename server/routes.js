@@ -11,7 +11,7 @@ const REDIRECT_URI = 'http://localhost:3000/callback';
 const STATE_KEY = 'spotify_auth_state';
 
 // your application requests authorization
-const scopes = ['user-read-private', 'user-read-email', 'user-read-playback-state', 'user-modify-playback-state','playlist-modify-private', 'playlist-modify-public', 'playlist-read-private', 'playlist-read-collaborative'];
+const scopes = ["streaming", 'user-top-read', 'user-read-private', 'user-read-email', 'user-read-playback-state', 'user-modify-playback-state','playlist-modify-private', 'playlist-modify-public', 'playlist-read-private', 'playlist-read-collaborative'];
 
 // configure spotify
 
@@ -59,18 +59,9 @@ router.get('/callback', (req, res) => {
     // Retrieve an access token and a refresh token
     spotifyApi.authorizationCodeGrant(code).then(data => {
       const { expires_in, access_token, refresh_token } = data.body;
-
-      // Set the access token on the API object to use it in later calls
       spotifyApi.setAccessToken(access_token);
       spotifyApi.setRefreshToken(refresh_token);
-
-      // use the access token to access the Spotify Web API
-      spotifyApi.getMe().then(({ body }) => {
-        console.log(body);
-      });
-      console.log(redirectToRoom)
-      // we can also pass the token to the browser to make requests from there
-      if(redirectToRoom === true){
+      if(redirectToRoom === true && room !== 'logo.ico'){
         redirectToRoom = false
         res.redirect(`/#/${room}/${access_token}/${refresh_token}`)
       }
@@ -81,12 +72,21 @@ router.get('/callback', (req, res) => {
   }
 });
 
+router.get('/refreshToken', function(req,res) {
+  console.log('caugh')
+  spotifyApi.refreshAccessToken().then(function(data) {
+    res.send(data.body['access_token'])
+  }, function(err) {
+    console.log('Could not refresh access token', err);
+  });
+})
+
 router.get('/:tagId', function(req, res) {
   room = req.params.tagId
   if(room == null || room == "null"){
     return
   }
-  if(room !== 'callback' || room !== 'login'){
+  if(room !== 'callback' || room !== 'login' || room !== 'refreshToken'){
       redirectToRoom = true;
       const state = generateRandomString(16);
       res.cookie(STATE_KEY, state);

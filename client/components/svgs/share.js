@@ -2,6 +2,29 @@ import React from 'react';
 
 
 export default class Share extends React.Component {
+	constructor(props){
+		super(props)
+		this.state = {
+			renderText: false,
+			displayMsg: false
+		}
+	}
+	copyText(){
+		this.setState({renderText: true}, () => {
+			this.textInput.select()
+			document.execCommand("Copy");
+			this.setState({renderText: false, displayMsg: true})
+		})
+		setTimeout(() => {
+			this.setState({displayMsg: false})
+		}, 1300)
+	}
+
+	shouldComponentUpdate(nextState){
+		const renderText = this.state.renderText !== nextState.renderText;
+		const displayMsg = this.state.displayMsg !== nextState.displayMsg;
+		return renderText || displayMsg
+	}
     render() {
         return (
         	<div className="shareContain">
@@ -12,6 +35,10 @@ export default class Share extends React.Component {
 				<h3 className="devices">
 					Share
 				</h3>
+				{this.state.renderText ? <input className="shareInput" ref={(input) => {this.textInput = input;}} value={"crowdplay.ca/" + this.props.roomName} /> : null }
+				{this.state.displayMsg ? <h2 className="message">Link copied to clipboard!</h2> : null}
+				<button className="shareButton" onClick={this.copyText.bind(this)}>
+				</button>
 			</div>
 		 )
     }

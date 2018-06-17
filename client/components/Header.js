@@ -24,10 +24,10 @@ export default class Header extends React.Component  {
 	        <h3>
 	        	Join at:
 	        </h3>
-        	<h1 className="roomHead">crowdplay.me/<span className="nameId">{this.props.roomName}</span></h1>
+        	<h1 className="roomHead">crowdplay.ca/<span className="nameId">{this.props.roomName}</span></h1>
        	
         </div>
-        <Share/>
+        <Share roomName={this.props.roomName}/>
       </div>
     );
   }
