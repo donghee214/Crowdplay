@@ -1,4 +1,4 @@
-# Jukebox - Crowdsource your playlist!
+# Crowdplay - Crowdsource your playlist!
 
 
 ### What is it?
